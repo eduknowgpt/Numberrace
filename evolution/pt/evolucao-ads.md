@@ -57,7 +57,7 @@ Modernizar e instrumentar o The Number Race para permitir a coleta estruturada, 
 4. melhorar o processo de build e desenvolvimento;
 5. revisar dependências e componentes legados;
 6. melhorar desempenho e responsividade;
-7. projetar uma arquitetura desacoplada de telemetria;
+7. projetar uma arquitetura desacoplada de registro de eventos;
 8. definir um modelo versionado de eventos;
 9. implementar mecanismos de sessão e identificação pseudonimizada;
 10. implementar persistência e exportação;
@@ -266,7 +266,7 @@ A solução deve buscar:
 - baixo acoplamento;
 - separação de responsabilidades;
 - eventos controlados;
-- tolerância a falhas de telemetria;
+- tolerância a falhas de registro de eventos;
 - versionamento do esquema;
 - formatos abertos;
 - documentação;
@@ -330,7 +330,7 @@ Uma equipe não precisa executar todas as frentes. Cada plano de trabalho deve d
 - inventário de dívida técnica;
 - benchmark de desempenho;
 - mecanismo de cache;
-- infraestrutura de telemetria;
+- infraestrutura de registro de eventos;
 - esquema de eventos;
 - exportador JSON;
 - exportador CSV;
@@ -449,7 +449,7 @@ O projeto poderá originar trabalhos independentes, por exemplo:
 - dashboards para acompanhamento de interação;
 - análise longitudinal de eventos;
 - técnicas de agrupamento aplicadas a padrões de interação;
-- geração assistida de relatórios a partir da telemetria.
+- geração assistida de relatórios a partir do registro de eventos.
 
 Cada trabalho deverá possuir problema, escopo, método e avaliação próprios.
 

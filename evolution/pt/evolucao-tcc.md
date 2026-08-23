@@ -131,7 +131,7 @@ As mudanças devem priorizar clareza, legibilidade, consistência, acessibilidad
 
 ### 9.3 Registro das interações
 
-O jogo deverá registrar eventos essenciais definidos no modelo de telemetria, por exemplo:
+O jogo deverá registrar eventos essenciais definidos no modelo de registro de eventos, por exemplo:
 
 - início e término da sessão;
 - início e término de atividade;
@@ -182,7 +182,7 @@ O TCC deverá documentar:
 
 ## 10. Exemplo de evento
 
-O esquema definitivo será definido pelo projeto de telemetria. Um evento poderá assumir forma semelhante a:
+O esquema definitivo será definido pelo projeto de registro de eventos. Um evento poderá assumir forma semelhante a:
 
 ```json
 {
@@ -227,7 +227,7 @@ O registro deve representar fatos observáveis da interação. Interpretações 
 - revisar PT-BR;
 - integrar áudios;
 - modernizar telas selecionadas;
-- integrar a telemetria;
+- integrar o registro de eventos;
 - corrigir problemas encontrados.
 
 ### Etapa 4 — Testes
@@ -281,7 +281,7 @@ A existência da funcionalidade de coleta **não autoriza automaticamente a real
 
 O Projeto Evolução ADS poderá fornecer:
 
-- arquitetura de telemetria;
+- arquitetura de registro de eventos;
 - componentes de registro;
 - gerenciamento de sessões;
 - persistência;
