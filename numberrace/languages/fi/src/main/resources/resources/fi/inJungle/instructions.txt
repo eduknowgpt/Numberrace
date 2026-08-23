@@ -1,0 +1,13 @@
+Tervetuloa viidakkoon!
+
+Näet pian ruudulla kaksi palmua.
+Valitse se, kummassa on enemmän kookospähkinöitä.
+Tarvitset niitä pelilaudalla etenemiseen.
+
+Tee valinta klikkaamalla hiirtä kuvakentän päällä.
+
+Jokaisen voittamasi pelin jälkeen saat vapauttaa vangittuna olevan eläimen.
+
+Varo kuitenkin matkalla vastaantulevia vaaroja!
+
+Klikkaa nyt alhaalla olevia kukkia päästäksesi aloittamaan.

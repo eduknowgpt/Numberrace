@@ -1,0 +1,3 @@
+!!! This file should be in UTF-8 encoding !!!!
+resources/gr/regScreenInfo.txt
+Put here Information you want to be presented inside HelpWindow in RegScreen.

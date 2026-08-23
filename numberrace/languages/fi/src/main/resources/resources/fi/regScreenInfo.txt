@@ -1,0 +1,55 @@
+Uuden pelaajan luominen:
+---------------------------------------------
+Klikkaa "Uusi pelaaja" -painiketta. Täytä kaikki tietokentät
+(sukunimi, etunimi, ikä, luokka, sukupuoli). Jokaisella pelaajalla
+täytyy olla ainutkertainen nimi. Voit muuttaa näitä tietoja myöhemmin.
+Aloitustaso tarkoittaa, miten haastavalta tasolta peli alkaa. Pelin
+aloittamisen jälkeen aloitustasoa ei voi vaihtaa, eikä peli käytä sitä
+tietoa, vaan pelin vaikeustaso muuttuu sen mukaan, miten lapsi pelissä
+etenee. Jos haluat muuttaa lapsen aloitustasoa, sinun on luotava uusi
+pelaaja. Tämä on tarpeellista lähinnä silloin, jos aloitustaso
+osoittautuu liian haasteelliseksi.
+Täytettyäsi kaikki tiedot klikkaa "Vahvista", jolloin pelaajaprofiili
+tallentuu koneelle tai "Peruuta", jolloin täyttämäsi tiedot pyyhitään
+pois. Luotavien pelaajien määrää ei ole rajoitettu.
+
+
+Pelaajan tietojen muokkaaminen:
+---------------------------------------------
+Voit muuttaa luomiesi pelaajien tietoja, jos olet esimerkiksi tehnyt
+vahingossa virhelyönnin, tai haluat vaihtaa tietoja lapsen iästä tai
+luokasta. Valitse tällöin ensin listalta sen pelaajan nimi, jonka
+tietoja haluat muokata. Klikkaa tämän jälkeen "Muokkaa". Muuta
+tarvittavat tiedot ja klikkaa "Vahvista". Voit peruuttaa muutoksesi
+painamalla "Peruuta".
+
+Pelaajan poistaminen:
+------------------------------
+Voit milloin tahansa poistaa pelaajan luettelosta. Valitse ensin
+poistettava pelaaja luettelosta, klikkaa "Muokkaa" ja sen jälkeen
+"Poista". Vastaa avautuvan varmistusikkunan kysymykseen "Kyllä"-
+painikkeella.
+
+
+Pelin käynnistäminen:
+-------------------------------
+Klikkaa pelaajaluettelosta sen pelaajan nimi, joka on pelivuorossa.
+Klikkaa tämän jälkeen "Aloita".
+
+
+Pelaajan vaihtaminen:
+-------------------------------
+Voit palata kesken pelin tähän näyttöön painamalla pelin aikana
+"Valikko" -painiketta ruudun vasemmassa ylälaidassa. Valitse avautuvasta
+valikosta toiminto "Vaihda pelaaja". Peli palaa avausnäkymään,
+josta voit valita toisen pelaajan.
+
+
+Pelin lopettaminen:
+--------------------------
+Klikkaa "Lopeta" -painiketta. Peli sulkeutuu.
+
+Huomio:
+Suositukset ovat arviointeja, jotka perustuvat lasten keskimääräiseen, iänmukaiseen osaamistasoon, johon myös koulunkäynnin määrä vaikuttaa. Koska lasten osaaminen vaihtelee yksilöittäin, huomioi aloitustason valinnassa lapsen matemaattinen ikä.
+Aloitustaso määrittää ainoastaan keskimääräisen tason, jolta peli alkaa. Peli voi esittää myös vaikeampi- tai helpompitasoisia tehtäviä arvioidakseen lapsen menestystä niissä. Pelin aloittamisen jälkeen peli käyttää lapsen suoritustietoja vaikeusasteen määrittelyssä, eikä aloitustasolla ole enää merkitystä. 
+Pelin aloittamisen jälkeen aloitustasoa ei voi vaihtaa. Mikäli välttämättä haluat muuttaa lapsen aloitustason, luo uusi pelaaja, ja määrittele tälle uudelle pelaajalle toinen aloitustaso.

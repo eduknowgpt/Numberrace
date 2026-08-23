@@ -1,0 +1,7 @@
+¡Tu viaje comienza en la jungla! Si llegas a la meta antes que tus enemigos, podrás rescatar a una mariposa.
+
+Encontrarás dos palmeras con cocos. Debes escoger aquélla que tiene más cocos, y avanzar el mismo número de casillas que de cocos.
+
+Vigila, encontrarás trampas: a veces tus enemigos intentarán adelantarte o podrás cruzarte con plantas carnívoras. Si caes en una casilla ocupada por ellas, debes retroceder.
+
+Clica sobre las flores para escoger tu personaje...

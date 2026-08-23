@@ -1,0 +1,7 @@
+¡Tu viaje comienza bajo el mar! Si llegas a la meta antes que tus enemigos, podrás rescatar a un pez.
+
+Encontrarás dos cofres, cada uno de los cuales contiene un tesoro. Debes escoger el cofre que tiene más monedas de oro, y avanzar el mismo número de casillas que de monedas.
+
+Vigila, encontrarás trampas: a veces tus enemigos intentarán adelantarte o podrás cruzarte con peligrosas anémonas. Si caes en una casilla ocupada por ellas, debes retroceder.
+
+Clica sobre la caracola para escoger tu personaje... 

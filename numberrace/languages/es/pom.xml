@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent><groupId>org.unicog.numberrace</groupId><artifactId>numberrace-languages</artifactId><version>3.1.0</version><relativePath>../pom.xml</relativePath></parent>
+  <artifactId>numberrace-langs_es</artifactId>
+  <version>0.0.1.notext</version>
+  <name>NumberRace Spanish Language Pack</name>
+  <properties><language.code>es</language.code></properties>
+  <build>
+    <finalName>numberrace-langs-${project.version}_${language.code}</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId><artifactId>maven-antrun-plugin</artifactId><version>3.1.0</version>
+        <executions><execution><id>stage-language-pack-for-eclipse</id><phase>package</phase><goals><goal>run</goal></goals>
+          <configuration><target>
+            <mkdir dir="${project.parent.basedir}/../numberrace-core/target/classes/langs"/>
+            <copy file="${project.build.directory}/${project.build.finalName}.jar" todir="${project.parent.basedir}/../numberrace-core/target/classes/langs" overwrite="true"/>
+          </target></configuration>
+        </execution></executions>
+      </plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <profile><id>deploy-local</id><build><plugins><plugin>
+      <groupId>org.apache.maven.plugins</groupId><artifactId>maven-antrun-plugin</artifactId><version>3.1.0</version>
+      <executions><execution><id>deploy-language-pack-local</id><phase>package</phase><goals><goal>run</goal></goals><configuration><target>
+        <mkdir dir="${user.home}/NumberRace/v3/langs"/>
+        <copy file="${project.build.directory}/${project.build.finalName}.jar" todir="${user.home}/NumberRace/v3/langs" overwrite="true"/>
+      </target></configuration></execution></executions>
+    </plugin></plugins></build></profile>
+  </profiles>
+</project>

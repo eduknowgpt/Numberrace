@@ -1,0 +1,8 @@
+Your journey starts under the sea!  If you get to the finish before your enemies, you will be allowed to rescue a fish.
+
+You will find two treasure chests, each with treasure inside. You should chose the chest which has the most gold pieces, to go forward that number of squares.
+
+Watch out, there are traps: sometimes your enemies will try to overtake you, or you will come across nasty anemones living on the squares. If you land on them, they send you backwards.
+
+
+Click on the shell to choose your character...

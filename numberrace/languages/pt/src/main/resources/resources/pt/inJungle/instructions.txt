@@ -1,0 +1,7 @@
+Sua jornada começa na selva! Se você chegar à linha de chegada antes dos seus adversários, poderá resgatar uma borboleta.
+
+Você encontrará duas palmeiras, cada uma com cocos. Você deve escolher aquela que tiver mais cocos para avançar o número correspondente de casas.
+
+Cuidado, existem armadilhas: às vezes, seus adversários tentarão ultrapassá-lo, ou você encontrará plantas perigosas nas casas. Se cair sobre elas, terá que voltar algumas casas.
+
+Clique nas flores para escolher seu personagem...

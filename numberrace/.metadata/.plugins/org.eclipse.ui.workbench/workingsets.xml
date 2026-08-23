@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workingSetManager>
+<workingSet editPageId="org.eclipse.jdt.internal.ui.DynamicSourcesWorkingSet" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1787431109285_0" label="Java Main Sources" name="Java Main Sources"/>
+<workingSet editPageId="org.eclipse.jdt.internal.ui.DynamicSourcesWorkingSet" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1787431109308_1" label="Java Test Sources" name="Java Test Sources"/>
+<workingSet editPageId="org.eclipse.ui.resourceWorkingSetPage" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1787431158862_3" label="numberrace" name="numberrace">
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/numberrace-res" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/numberrace-core" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/languages" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/numberrace-langs_de" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/numberrace-langs_el" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/numberrace-langs_en" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/numberrace-langs_es" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/numberrace-langs_fi" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/numberrace-langs_fr" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/numberrace-langs_nl" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/numberrace-langs_pt" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/numberrace-langs_sv" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/numberrace-langs-editor" type="4"/>
+</workingSet>
+<workingSet aggregate="true" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1787431110763_2" label="Window Working Set" name="Aggregate for window 1787431110763"/>
+<workingSet aggregate="true" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1787434151715_4" label="Window Working Set" name="Aggregate for window 1787434151715"/>
+</workingSetManager>

@@ -1,0 +1,3 @@
+!!! This file should be in UTF-8 encoding !!!!
+resources/gr/credits.txt
+Put here Localized credits.

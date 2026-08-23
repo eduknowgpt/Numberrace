@@ -1,0 +1,7 @@
+Sua jornada começa no fundo do mar! Se você chegar à linha de chegada antes dos seus adversários, poderá resgatar um peixe.
+
+Você encontrará dois baús de tesouro, cada um contendo tesouros. Você deve escolher o baú que tiver mais moedas de ouro para avançar o número correspondente de casas.
+
+Cuidado, existem armadilhas: às vezes, seus adversários tentarão ultrapassá-lo, ou você encontrará anêmonas perigosas nas casas. Se cair sobre elas, será mandado para trás.
+
+Clique na concha para escolher seu personagem...

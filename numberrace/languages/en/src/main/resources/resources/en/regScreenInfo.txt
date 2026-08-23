@@ -1,0 +1,11 @@
+It is VERY IMPORTANT that each student is registered and plays always and only under their own name. This is because the game adapts to the performance level of each individual student, and keeps a record of the student’s previous progress.
+
+In order to enter a new student, click on “New student”. Enter the students’ details on the right hand side of the screen, and click on “Enter”. Enter all the information for the student, and choose the level (from 1-14) that he/she starts at.
+
+In order to modify the information for a student, select that student by clicking on their name in the list, then click on “Modify”. Change the students’ details on the right hand side of the screen, and click on “Enter”.
+
+In order to delete a student, select that student by clicking on their name in the list. Then click on “Delete”
+
+After a few turns, the program will start to adapt to the students’ performance, and will continue to do so whenever the student plays. It will change the difficulty of the problems presented so that the student is answering correctly 75% of the time.
+
+ If you start a student on a level with which they have great difficulty, or which is far too easy, you can always exit via "Menu", delete the student’s record, and re-create it with a different level. If the level you chose is only slightly too difficult or easy, don’t worry - the program will adapt backwards or forwards as necessary.

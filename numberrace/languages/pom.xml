@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent><groupId>fi.nmi.numberrace</groupId><artifactId>numberrace</artifactId><version>3.1.0</version><relativePath>../pom.xml</relativePath></parent>
+  <groupId>org.unicog.numberrace</groupId>
+  <artifactId>numberrace-languages</artifactId>
+  <packaging>pom</packaging>
+  <name>NumberRace Language Packs</name>
+  <modules>
+    <module>de</module><module>el</module><module>en</module><module>es</module><module>fi</module><module>fr</module><module>nl</module><module>pt</module><module>sv</module>
+  </modules>
+  <build>
+    <plugins>
+      <plugin><artifactId>maven-resources-plugin</artifactId><version>3.3.1</version><configuration><encoding>UTF-8</encoding></configuration></plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <profile>
+      <id>deploy-local</id>
+      <properties><numberrace.lang.dir>${user.home}/NumberRace/v3/langs</numberrace.lang.dir></properties>
+      <build><pluginManagement><plugins>
+        <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-antrun-plugin</artifactId><version>3.1.0</version></plugin>
+      </plugins></pluginManagement></build>
+    </profile>
+  </profiles>
+</project>

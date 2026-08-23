@@ -1,0 +1,13 @@
+É MUITO IMPORTANTE que cada aluno seja cadastrado e jogue sempre e somente com seu próprio nome. Isso ocorre porque o jogo se adapta ao nível de desempenho individual de cada aluno e mantém um registro de seu progresso anterior.
+
+Para cadastrar um novo aluno, clique em “Novo aluno”. Informe os dados do aluno no lado direito da tela e clique em “Entrar”. Preencha todas as informações do aluno e escolha o nível (de 1 a 14) em que ele começará.
+
+Para modificar as informações de um aluno, selecione-o clicando em seu nome na lista e, em seguida, clique em “Modificar”. Altere os dados do aluno no lado direito da tela e clique em “Entrar”.
+
+Para excluir um aluno, selecione-o clicando em seu nome na lista. Em seguida, clique em “Excluir”.
+
+Após algumas rodadas, o programa começará a se adaptar ao desempenho do aluno e continuará fazendo isso sempre que ele jogar. A dificuldade dos problemas apresentados será ajustada de modo que o aluno consiga responder corretamente 75% das vezes.
+
+Se você iniciar um aluno em um nível que seja muito difícil para ele ou que seja fácil demais, você poderá sair pelo “Menu”, excluir o registro do aluno e cadastrá-lo novamente em um nível diferente.
+
+Se o nível escolhido for apenas um pouco difícil ou fácil demais, não se preocupe: o programa fará os ajustes necessários, aumentando ou diminuindo o nível de dificuldade conforme o desempenho do aluno.

@@ -1,0 +1,19 @@
+La carrera de los números
+The Number Race: Remediation Software for dyscalculia
+Copyright (C) 2004 Anna J. Wilson and Stanislas Dehaene
+
+Este programa es Software Libre; usted puede redistribuirlo
+y/o modificarlo bajo los términos de la "GNU General Public
+License" como lo publica la "FSF Free Software Foundation",
+o (a su elección) de cualquier versión posterior.
+
+Este programa es distribuido con la esperanza de que le será
+útil, pero SIN NINGUNA GARANTIA; incluso sin la garantía
+implícita por el MERCADEO o EJERCICIO DE ALGUN PROPOSITO en
+particular. Vea la "GNU General Public License" para más
+detalles.
+
+Usted debe haber recibido una copia de la "GNU General Public
+License" junto con este programa, si no, escriba a la "FSF
+Free Software Foundation, Inc.", 59 Temple Place - Suite 330,
+Boston, MA  02111-1307, USA.

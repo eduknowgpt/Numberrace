@@ -1,0 +1,7 @@
+Ton voyage va commencer dans le jungle! Si tu parviens à l'arrivée avant tes ennemis, tu auras le droit de sauver un papillon.
+
+Tu vas trouver deux palmiers, chacun avec des noix de coco. Tu dois choisir celui qui contient le plus de noix de coco, pour avancer du même nombre de cases.
+
+Attention, il y a des pièges: parfois tes ennemis vont essayer de te doubler, et de méchantes plantes peuvent être postées sur des cases. Si tu tombes dessus, tu devras reculer.
+
+Clique sur les fleurs pour choisir ton personnage...

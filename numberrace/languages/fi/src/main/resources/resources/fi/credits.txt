@@ -1,0 +1,39 @@
+Suunnittelu ja toteutus
+
+Anna Wilson
+Stanislas Dehaene
+
+Grafiikka
+
+Philippe Pinel
+Caroline Jakubek
+
+Musiikki
+
+Luc Foubert
+Philippe Pinel
+
+
+Suomenkielinen versio
+
+Suomennos alkuperäisversiosta
+
+Jonna Salminen
+
+Äänet
+
+Jonna Salminen
+Marko Lehtonen
+
+Äänitykset
+
+Pekka Vesamaa
+YLE Keski-Suomi
+
+Tekninen kehitystyö
+
+Oleksandr Maslov
+Pekka Räsänen
+Ugne Maslova
+Johanna Manninen
+Tero Lehtinen

@@ -1,0 +1,654 @@
+package org.unicog.numberrace.sound;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
+
+import org.unicog.numberrace.util.ResourceProvider;
+import org.unicog.numberrace.util.Resources;
+import org.unicog.numberrace.util.Utilities;
+
+public class SoundManager {
+
+	private static final Logger log = Logger.getLogger(SoundManager.class.getPackage()
+			.getName());
+
+	public static boolean soundsON = true;
+
+	private static SoundManager sm;
+	private Map<String, Integer> cachedST = new HashMap<String, Integer>();
+
+	private Map<String, String> soundMap; //maps sound key string to sound file string, contains all sounds
+	private Map<String, Integer> soundID; //maps soundID to key string, contains sounds loaded into RAM
+	private Sound[] commonSounds; //this array stores data for sounds that are commonly played
+
+	private final static String[] COMMON_SOUND_LIST = { "iconClick" }; //$NON-NLS-1$
+
+	private SoundPlayer soundPlayer;
+
+	private SoundManager() {
+		soundPlayer = new SoundPlayer();
+
+		commonSounds = new Sound[COMMON_SOUND_LIST.length];
+		initializeSoundMap();
+		initializeGameSounds(COMMON_SOUND_LIST);
+	}
+
+	public void stopAllSounds() {
+		soundPlayer.stop();
+	}
+
+	public void close() {
+		soundPlayer.shutdown();
+	}
+
+	/**
+	 * Sets the paused state. Sounds may not pause immediately.
+	 */
+	public void setPaused(boolean paused) {
+		if (paused) {
+			soundPlayer.pause();
+		} else {
+			soundPlayer.unpause();
+		}
+	}
+
+	/**
+	 * Plays one of the game sounds
+	 */
+	public void play(String soundKey) {
+		if (soundsON) {
+			play(soundKey, null);
+		}
+	}
+
+	public void play(String soundKey, SoundListener l) {
+		if (soundsON) {
+			try {
+				play(soundKey, false, l);
+			} catch (Exception e) {
+				if (l != null)
+					l.run();
+			}
+		} else if (l != null) {
+			l.run();
+		}
+	}
+
+	/**
+	 * Plays one of the game sounds, with optional looping
+	 */
+	public void play(String soundKey, boolean loop) {
+		if (soundsON) {
+			play(soundKey, loop, null);
+		}
+	}
+
+	private void play(String soundKey, boolean loop, SoundListener l) {
+
+		final boolean isSoundID = soundID.get(soundKey) != null;
+		if (log.isLoggable(Level.FINE)) {
+			log.fine(String.format("[%s] soundID ? - %b ", soundKey, isSoundID));
+		}
+
+		if (isSoundID) {
+			Integer tmpSoundID = soundID.get(soundKey); //get current sound value
+			play(commonSounds[tmpSoundID.intValue()], loop, l);
+		} else { //if not, stream from the file on disk, use SoundID map to get filename
+			String fileName = soundMap.get(soundKey);
+			System.out.println("==================================");
+			System.out.println("SOUND KEY = " + soundKey);
+			System.out.println("SOUND MAP = " + fileName);
+			System.out.println("RESOLVED = "
+			        + Resources.getLocalizedThemedPath(fileName));
+			System.out.println("URL = "
+			        + ResourceProvider.getResource(fileName));
+			System.out.println("==================================");
+			
+			log.info(String.format("Trying to play sound[%s] file: %s ",
+					soundKey,
+					String.valueOf(fileName)));
+			if (fileName == null) {
+				fileName = Resources.getString(String.format("SoundManager.%s",
+						soundKey));
+				if (fileName != null) {
+					soundMap.put(soundKey, fileName);
+				}
+			}
+			play(soundKey,
+					getAudioInputStream(String.valueOf(fileName)),
+					loop,
+					l);
+		}
+	}
+
+	public void play(Sound sound, boolean loop, SoundListener l) {
+		if (sound != null) {
+			play(sound.getKey(), getAudioInputStream(new ByteArrayInputStream(
+					sound.getSamples())), loop, l);
+		}
+	}
+
+	/**
+	 * Plays a sound from an InputStream. This method returns immediately.
+	 */
+	protected void play(String soundKey,
+			AudioInputStream is,
+			boolean loop,
+			SoundListener l) {
+
+		if (is == null) {
+			log.warning("Unable to play sound: " + soundKey);
+
+			if (l != null) {
+				l.run();
+			}
+			return;
+		}
+
+		soundPlayer.play(is, loop, l);
+	}
+
+	private void initializeGameSounds(String[] soundKeys) {
+		//loads up the game sounds that are short and commonly used into Sound
+		// objects,
+		//which are stored in RAM. The rest of the sounds are streamed directly
+		// from the file
+		soundID = new HashMap<String, Integer>();
+		for (int i = 0; i < soundKeys.length /* NUM_COMMON_SOUNDS */; i++) {
+			//add to the id to the hashmap
+			soundID.put(soundKeys[i], i);
+			//put the sound in the Sound array
+			String sndName = String.valueOf(soundMap.get(soundKeys[i]));
+			commonSounds[i] = getSound(sndName);
+			if (commonSounds[i] == null) {
+				Utilities.log.severe("Putting null in commonSounds for "
+						+ sndName);
+			}
+			//            System.out.println("SM IGS: put " + soundKeys[i] + "in the
+			//             soundID list");
+		}
+	}
+
+	private void initializeSoundMap() {
+		log.info("Initializing sound map");
+		//Stores a sound key to sound file map for all sounds in the game
+		soundMap = new HashMap<String, String>(); //keeps track of IDs of all the sounds
+
+		//Characters-Friend1-Dialog
+		soundMap.put("friend1_youChose", //$NON-NLS-1$
+				Resources.getString("SoundManager.friend1_youChose")); //$NON-NLS-1$
+		soundMap.put("friend1_youHaveMore", //$NON-NLS-1$
+				Resources.getString("SoundManager.friend1_youHaveMore")); //$NON-NLS-1$
+		soundMap.put("friend1_youHaveLess", //$NON-NLS-1$
+				Resources.getString("SoundManager.friend1_youHaveLess")); //$NON-NLS-1$
+		soundMap.put("friend1_andYouGet", //$NON-NLS-1$
+				Resources.getString("SoundManager.friend1_andYouGet")); //$NON-NLS-1$
+		soundMap.put("friend1_landedOnTrap", //$NON-NLS-1$
+				Resources.getString("SoundManager.friend1_landedOnTrap")); //$NON-NLS-1$
+
+		//Characters-Friend1-Numbers
+		soundMap.put("friend1_plus", //$NON-NLS-1$
+				Resources.getString("SoundManager.friend1_plus")); //$NON-NLS-1$
+		soundMap.put("friend1_minus", //$NON-NLS-1$
+				Resources.getString("SoundManager.friend1_minus")); //$NON-NLS-1$
+		soundMap.put("friend1_equals", //$NON-NLS-1$
+				Resources.getString("SoundManager.friend1_equals")); //$NON-NLS-1$
+
+		// Loading numbers from path property
+
+		String[] friendNumbers = {
+				"zero", "one", "two", "three", "four",
+				"five", "six", "seven", "eight", "nine", "ten"
+		};
+
+		String friendNumbersPath =
+				Resources.getString("SoundManager.friend1_numbers_path");
+
+		for (int i = 0; i < friendNumbers.length; i++) {
+			soundMap.put(
+					"friend1_" + i,
+					friendNumbersPath + "/" + friendNumbers[i] + ".wav"
+					);
+		}
+
+		String[] friendCountingNumbers = {
+				null,
+				"counting_one",
+				"counting_two",
+				"counting_three",
+				"counting_four",
+				"counting_five",
+				"counting_six",
+				"counting_seven",
+				"counting_eight"
+		};
+
+		for (int i = 1; i < friendCountingNumbers.length; i++) {
+			soundMap.put(
+					"friend1_counting_" + i,
+					friendNumbersPath + "/" + friendCountingNumbers[i] + ".wav"
+					);
+		}
+
+		/*
+            soundMap.put("friend1_one", //$NON-NLS-1$
+                     Resources.getString("SoundManager.friend1_one")); //$NON-NLS-1$
+            soundMap.put("friend1_two", //$NON-NLS-1$
+                     Resources.getString("SoundManager.friend1_two")); //$NON-NLS-1$
+            soundMap.put("friend1_three", //$NON-NLS-1$
+                     Resources.getString("SoundManager.friend1_three")); //$NON-NLS-1$
+            soundMap.put("friend1_four", //$NON-NLS-1$
+                     Resources.getString("SoundManager.friend1_four")); //$NON-NLS-1$
+            soundMap.put("friend1_five", //$NON-NLS-1$
+                     Resources.getString("SoundManager.friend1_five")); //$NON-NLS-1$
+            soundMap.put("friend1_six", //$NON-NLS-1$
+                     Resources.getString("SoundManager.friend1_six")); //$NON-NLS-1$
+            soundMap.put("friend1_seven", //$NON-NLS-1$
+                     Resources.getString("SoundManager.friend1_seven")); //$NON-NLS-1$
+            soundMap.put("friend1_eight", //$NON-NLS-1$
+                     Resources.getString("SoundManager.friend1_eight")); //$NON-NLS-1$
+            soundMap.put("friend1_nine", //$NON-NLS-1$
+                     Resources.getString("SoundManager.friend1_nine")); //$NON-NLS-1$
+            soundMap.put("friend1_ten", //$NON-NLS-1$
+                     Resources.getString("SoundManager.friend1_ten")); //$NON-NLS-1$
+            soundMap.put("friend1_zero", //$NON-NLS-1$
+                     Resources.getString("SoundManager.friend1_zero")); //$NON-NLS-1$
+
+            soundMap.put("friend1_counting_one", //$NON-NLS-1$
+                     Resources.getString("SoundManager.friend1_counting_one")); //$NON-NLS-1$
+            soundMap.put("friend1_counting_two", //$NON-NLS-1$
+                     Resources.getString("SoundManager.friend1_counting_two")); //$NON-NLS-1$
+            soundMap.put("friend1_counting_three", //$NON-NLS-1$
+                     Resources.getString("SoundManager.friend1_counting_three")); //$NON-NLS-1$
+            soundMap.put("friend1_counting_four", //$NON-NLS-1$
+                     Resources.getString("SoundManager.friend1_counting_four")); //$NON-NLS-1$
+            soundMap.put("friend1_counting_five", //$NON-NLS-1$
+                     Resources.getString("SoundManager.friend1_counting_five")); //$NON-NLS-1$
+            soundMap.put("friend1_counting_six", //$NON-NLS-1$
+                     Resources.getString("SoundManager.friend1_counting_six")); //$NON-NLS-1$
+            soundMap.put("friend1_counting_seven", //$NON-NLS-1$
+                     Resources.getString("SoundManager.friend1_counting_seven")); //$NON-NLS-1$
+            soundMap.put("friend1_counting_eight", //$NON-NLS-1$
+                     Resources.getString("SoundManager.friend1_counting_eight")); //$NON-NLS-1$
+            soundMap.put("friend1_counting_nine", //$NON-NLS-1$
+                     Resources.getString("SoundManager.friend1_counting_nine")); //$NON-NLS-1$
+
+		 *
+		 */
+
+		//Characters-Friend1-Noises
+		soundMap.put("dolphinClick", //$NON-NLS-1$
+				Resources.getString("SoundManager.dolphinClick")); //$NON-NLS-1$
+		soundMap.put("dolphinSqueak", //$NON-NLS-1$
+				Resources.getString("SoundManager.dolphinSqueak")); //$NON-NLS-1$
+		soundMap.put("whale1Bubble", //$NON-NLS-1$
+				Resources.getString("SoundManager.whale1Bubble")); //$NON-NLS-1$
+		soundMap.put("whale2Bubble", //$NON-NLS-1$
+				Resources.getString("SoundManager.whale2Bubble")); //$NON-NLS-1$
+		soundMap.put("whale3Bubble", //$NON-NLS-1$
+				Resources.getString("SoundManager.whale3Bubble")); //$NON-NLS-1$
+		soundMap.put("orcaSplash", //$NON-NLS-1$
+				Resources.getString("SoundManager.orcaSplash")); //$NON-NLS-1$
+
+		//Characters-Enemy1-Dialog
+		soundMap.put("enemy1_wellSee", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_wellSee")); //$NON-NLS-1$
+		soundMap.put("enemy1_andITake", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_andITake")); //$NON-NLS-1$
+		soundMap.put("enemy1_iTake", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_iTake")); //$NON-NLS-1$
+		soundMap.put("enemy1_iWentTheFurtherest", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_iWentTheFurtherest")); //$NON-NLS-1$
+		soundMap.put("enemy1_youWentTheFurtherest", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_youWentTheFurtherest")); //$NON-NLS-1$
+		soundMap.put("enemy1_moveMeForward", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_moveMeForward")); //$NON-NLS-1$
+		soundMap.put("enemy1_youSentMeBack", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_youSentMeBack")); //$NON-NLS-1$
+		soundMap.put("enemy1_youHaveToGoBack", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_youHaveToGoBack")); //$NON-NLS-1$
+		soundMap.put("enemy1_iHaveTheMost", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_iHaveTheMost")); //$NON-NLS-1$
+		soundMap.put("enemy1_iHaveTheLeast", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_iHaveTheLeast")); //$NON-NLS-1$
+		soundMap.put("enemy1_landedOnTrap", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_landedOnTrap")); //$NON-NLS-1$
+		soundMap.put("enemy1_iTookTheMost", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_iTookTheMost")); //$NON-NLS-1$
+		soundMap.put("enemy1_youreCatchingUp", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_youreCatchingUp")); //$NON-NLS-1$
+		soundMap.put("enemy1_imStillAhead", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_imStillAhead")); //$NON-NLS-1$
+		soundMap.put("enemy1_imAhead", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_imAhead")); //$NON-NLS-1$
+		soundMap.put("enemy1_tryToCatchMe", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_tryToCatchMe")); //$NON-NLS-1$
+		soundMap.put("enemy1_iveOvertakenYou", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_iveOvertakenYou")); //$NON-NLS-1$
+		soundMap.put("enemy1_youveOvertakenMe", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_youveOvertakenMe")); //$NON-NLS-1$
+		soundMap.put("enemy1_youreStillAhead", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_youreStillAhead")); //$NON-NLS-1$
+		soundMap.put("enemy1_imCatchingUp", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_imCatchingUp")); //$NON-NLS-1$
+		soundMap.put("enemy1_justBehind", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_justBehind")); //$NON-NLS-1$
+		soundMap.put("enemy1_gettingBehind", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_gettingBehind")); //$NON-NLS-1$
+		soundMap.put("enemy1_imMilesBehind", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_imMilesBehind")); //$NON-NLS-1$
+
+		//Characters-Enemy1-Noises
+		soundMap.put("enemy1_crab2Click", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_crab2Click")); //$NON-NLS-1$
+		soundMap.put("crab3Click", //$NON-NLS-1$
+				Resources.getString("SoundManager.crab3Click")); //$NON-NLS-1$
+		soundMap.put("puffFish", //$NON-NLS-1$
+				Resources.getString("SoundManager.puffFish")); //$NON-NLS-1$
+		soundMap.put("squidSquirt", //$NON-NLS-1$
+				Resources.getString("SoundManager.squidSquirt")); //$NON-NLS-1$
+
+		//Characters-Enemy1-Numbers
+		soundMap.put("enemy1_plus", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_plus")); //$NON-NLS-1$
+		soundMap.put("enemy1_minus", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_minus")); //$NON-NLS-1$
+		soundMap.put("enemy1_equals", //$NON-NLS-1$
+				Resources.getString("SoundManager.enemy1_equals")); //$NON-NLS-1$
+
+		String[] enemyNumbers = {
+				"zero_ennemi",
+				"un_ennemi",
+				"deux_ennemi",
+				"trois_ennemi",
+				"quatre_ennemi",
+				"cinq_ennemi",
+				"six_ennemi",
+				"sept_ennemi",
+				"huit_ennemi",
+				"neuf_ennemi",
+				"dix_ennemi"
+		};
+
+		String enemyNumbersPath =
+				Resources.getString("SoundManager.enemy1_numbers_path");
+
+		for (int i = 0; i < enemyNumbers.length; i++) {
+			soundMap.put(
+					"enemy1_" + i,
+					enemyNumbersPath + "/" + enemyNumbers[i] + ".wav"
+					);
+		}
+
+		String[] enemyCountingNumbers = {
+				null,
+				"un_comptage_ennemi",
+				"deux_comptage_ennemi",
+				"trois_comptage_ennemi",
+				"quatre_comptage_ennemi",
+				"cinq_comptage_ennemi",
+				"six_comptage_ennemi",
+				"sept_comptage_ennemi",
+				"huit_comptage_ennemi"
+		};
+
+		for (int i = 1; i < enemyCountingNumbers.length; i++) {
+			soundMap.put(
+					"enemy1_counting_" + i,
+					enemyNumbersPath + "/" + enemyCountingNumbers[i] + ".wav"
+					);
+		}
+
+		/*
+        soundMap.put("enemy1_one", //$NON-NLS-1$
+                     Resources.getString("SoundManager.enemy1_one")); //$NON-NLS-1$
+        soundMap.put("enemy1_two", //$NON-NLS-1$
+                     Resources.getString("SoundManager.enemy1_two")); //$NON-NLS-1$
+        soundMap.put("enemy1_three", //$NON-NLS-1$
+                     Resources.getString("SoundManager.enemy1_three")); //$NON-NLS-1$
+        soundMap.put("enemy1_four", //$NON-NLS-1$
+                     Resources.getString("SoundManager.enemy1_four")); //$NON-NLS-1$
+        soundMap.put("enemy1_five", //$NON-NLS-1$
+                     Resources.getString("SoundManager.enemy1_five")); //$NON-NLS-1$
+        soundMap.put("enemy1_six", //$NON-NLS-1$
+                     Resources.getString("SoundManager.enemy1_six")); //$NON-NLS-1$
+        soundMap.put("enemy1_seven", //$NON-NLS-1$
+                     Resources.getString("SoundManager.enemy1_seven")); //$NON-NLS-1$
+        soundMap.put("enemy1_eight", //$NON-NLS-1$
+                     Resources.getString("SoundManager.enemy1_eight")); //$NON-NLS-1$
+        soundMap.put("enemy1_nine", //$NON-NLS-1$
+                     Resources.getString("SoundManager.enemy1_nine")); //$NON-NLS-1$
+        soundMap.put("enemy1_ten", //$NON-NLS-1$
+                     Resources.getString("SoundManager.enemy1_ten")); //$NON-NLS-1$
+        soundMap.put("enemy1_zero", //$NON-NLS-1$
+                     Resources.getString("SoundManager.enemy1_zero")); //$NON-NLS-1$
+        soundMap.put("enemy1_counting_one", //$NON-NLS-1$
+                     Resources.getString("SoundManager.enemy1_counting_one")); //$NON-NLS-1$
+        soundMap.put("enemy1_counting_two", //$NON-NLS-1$
+                     Resources.getString("SoundManager.enemy1_counting_two")); //$NON-NLS-1$
+        soundMap.put("enemy1_counting_three", //$NON-NLS-1$
+                     Resources.getString("SoundManager.enemy1_counting_three")); //$NON-NLS-1$
+        soundMap.put("enemy1_counting_four", //$NON-NLS-1$
+                     Resources.getString("SoundManager.enemy1_counting_four")); //$NON-NLS-1$
+        soundMap.put("enemy1_counting_five", //$NON-NLS-1$
+                     Resources.getString("SoundManager.enemy1_counting_five")); //$NON-NLS-1$
+        soundMap.put("enemy1_counting_six", //$NON-NLS-1$
+                     Resources.getString("SoundManager.enemy1_counting_six")); //$NON-NLS-1$
+        soundMap.put("enemy1_counting_seven", //$NON-NLS-1$
+                     Resources.getString("SoundManager.enemy1_counting_seven")); //$NON-NLS-1$
+        soundMap.put("enemy1_counting_eight", //$NON-NLS-1$
+                     Resources.getString("SoundManager.enemy1_counting_eight")); //$NON-NLS-1$
+        soundMap.put("enemy1_counting_nine", //$NON-NLS-1$
+                     Resources.getString("SoundManager.enemy1_counting_nine")); //$NON-NLS-1$
+		 *
+		 */
+
+		//Characters-hazards
+		soundMap.put("anemone1", Resources.getString("SoundManager.anemone1")); //$NON-NLS-1$ //$NON-NLS-2$
+		soundMap.put("anemone2", Resources.getString("SoundManager.anemone2")); //$NON-NLS-1$ //$NON-NLS-2$
+		soundMap.put("anemone3", Resources.getString("SoundManager.anemone3")); //$NON-NLS-1$ //$NON-NLS-2$
+
+		//Effects
+		soundMap.put("iconClick", Resources.getString("SoundManager.iconClick")); //$NON-NLS-1$ //$NON-NLS-2$
+		soundMap.put("chestOpen", Resources.getString("SoundManager.chestOpen")); //$NON-NLS-1$ //$NON-NLS-2$
+		soundMap.put("wrong2", Resources.getString("SoundManager.wrong2")); //$NON-NLS-1$ //$NON-NLS-2$
+		soundMap.put("wrong1", Resources.getString("SoundManager.wrong1")); //$NON-NLS-1$ //$NON-NLS-2$
+		soundMap.put("right", Resources.getString("SoundManager.right")); //$NON-NLS-1$ //$NON-NLS-2$
+		soundMap.put("cheer", Resources.getString("SoundManager.cheer")); //$NON-NLS-1$ //$NON-NLS-2$
+
+		//Help
+		// soundMap.put("toContinue", Resources.getString("SoundManager.toContinue")); //$NON-NLS-1$ //$NON-NLS-2$
+		soundMap.put("chooseSide", Resources.getString("SoundManager.chooseSide")); //$NON-NLS-1$ //$NON-NLS-2$
+		soundMap.put("chooseQuickly", Resources.getString("SoundManager.chooseQuickly")); //$NON-NLS-1$ //$NON-NLS-2$
+		soundMap.put("watchOutNewTraps", //$NON-NLS-1$
+				Resources.getString("SoundManager.watchOutNewTraps")); //$NON-NLS-1$
+		soundMap.put("moveYourCharacter", Resources.getString("SoundManager.moveYourCharacter")); //$NON-NLS-1$ //$NON-NLS-2$
+
+		//CharacChoiceScreen
+		soundMap.put("chooseCharacter", //$NON-NLS-1$
+				Resources.getString("SoundManager.chooseCharacter")); //$NON-NLS-1$
+		soundMap.put("characterLocked", //$NON-NLS-1$
+				Resources.getString("SoundManager.characterLocked")); //$NON-NLS-1$
+		soundMap.put("winToUnlock", //$NON-NLS-1$
+				Resources.getString("SoundManager.winToUnlock")); //$NON-NLS-1$
+		soundMap.put("unlockedCharacter", //$NON-NLS-1$
+				Resources.getString("SoundManager.unlockedCharacter")); //$NON-NLS-1$
+
+		//ThemeChoiceScreen
+		soundMap.put("chooseTheme", //$NON-NLS-1$
+				Resources.getString("SoundManager.chooseTheme")); //$NON-NLS-1$
+
+		//GameOverScreen
+		soundMap.put("gameOver", Resources.getString("SoundManager.gameOver")); //$NON-NLS-1$ //$NON-NLS-2$
+		soundMap.put("wellDone", Resources.getString("SoundManager.wellDone")); //$NON-NLS-1$ //$NON-NLS-2$
+		soundMap.put("badLuck", Resources.getString("SoundManager.badLuck")); //$NON-NLS-1$ //$NON-NLS-2$
+		soundMap.put("youHaveWon", Resources.getString("SoundManager.youHaveWon")); //$NON-NLS-1$ //$NON-NLS-2$
+		soundMap.put("gamesOutOf", Resources.getString("SoundManager.gamesOutOf")); //$NON-NLS-1$ //$NON-NLS-2$
+		soundMap.put("youGetReward", Resources.getString("SoundManager.youGetReward")); //$NON-NLS-1$ //$NON-NLS-2$
+
+		//RewardScreens
+		soundMap.put("takeReward", Resources.getString("SoundManager.takeReward")); //$NON-NLS-1$ //$NON-NLS-2$
+		soundMap.put("hereAreRewards", //$NON-NLS-1$
+				Resources.getString("SoundManager.hereAreRewards")); //$NON-NLS-1$
+
+		//Instructions
+		soundMap.put("instrucsUnderwater", Resources.getString("SoundManager.instrucsUnderwater")); //$NON-NLS-1$ //$NON-NLS-2$
+		soundMap.put("instrucsJungle", Resources.getString("SoundManager.instrucsJungle")); //$NON-NLS-1$ //$NON-NLS-2$
+
+		//Music
+		soundMap.put("introMusic", Resources.getString("SoundManager.introMusic")); //$NON-NLS-1$ //$NON-NLS-2$
+		soundMap.put("background2", Resources.getString("SoundManager.background2")); //$NON-NLS-1$ //$NON-NLS-2$
+		soundMap.put("background2LowVol", Resources.getString("SoundManager.background2LowVol")); //$NON-NLS-1$ //$NON-NLS-2$
+		soundMap.put("rewardMusic", Resources.getString("SoundManager.rewardMusic")); //$NON-NLS-1$ //$NON-NLS-2$
+		soundMap.put("rewardChoice", Resources.getString("SoundManager.rewardChoice")); //$NON-NLS-1$ //$NON-NLS-2$
+
+		//        if (log.getLevel().intValue() >= log.getLevel().FINE.intValue()) {
+		//            StringBuffer sb = new StringBuffer("SoundMap : ");
+		//            for (Iterator iterator = soundMap.entrySet().iterator(); iterator
+		//                    .hasNext();) {
+		//                Map.Entry entry = (Map.Entry) iterator.next();
+		//                sb.append("\n").append(entry.getKey()).append("\t=\t").append(
+		//                        entry.getValue());
+		//            }
+		//            log.fine(sb.toString());
+		//        }
+
+	}
+
+	/**
+	 * Loads a Sound from the file system. Returns null if an error occurs.
+	 */
+	private Sound getSound(String filename) {
+		return getSound(filename,
+				getAudioInputStream(ResourceProvider.getResourceAsStream(filename)));
+	}
+
+	/**
+	 * Loads a Sound from an AudioInputStream.
+	 * @param filename
+	 */
+	private Sound getSound(String fileName, AudioInputStream audioStream) {
+		if (audioStream == null) {
+			return null;
+		}
+
+		// get the number of bytes to read
+
+		ByteArrayOutputStream samples = new ByteArrayOutputStream();
+
+		// read the entire stream
+		byte[] buffer = new byte[100 * 1024];
+
+		try {
+			while (true) {
+				int read = audioStream.read(buffer, 0, buffer.length);
+				if (read == -1) {
+					break;
+				}
+				if (read > 0) {
+					samples.write(buffer, 0, read);
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+		}
+
+		// return the samples
+		return new Sound(fileName, samples.toByteArray());
+	}
+
+	public int getSoundTime(String sound2Play) {
+		if (cachedST.containsKey(sound2Play)) {
+			return cachedST.get(sound2Play).intValue();
+		}
+
+		AudioInputStream audioInputStream = getAudioInputStream(soundMap.get(sound2Play));
+		int time = 0;
+		if (audioInputStream != null) {
+			time = (int) (audioInputStream.getFrameLength() / (audioInputStream.getFormat()
+					.getFrameRate() / 1000));
+		} else {
+			log.severe("NO AUDIO INPUT STREAM FOR :" + sound2Play);
+		}
+		if (log.isLoggable(Level.FINE)) {
+			log.fine(sound2Play + " PlayTime : " + time);
+		}
+		cachedST.put(sound2Play, new Integer(time));
+		return time;
+	}
+
+	/**
+	 * Creates an AudioInputStream from a sound from the file system.
+	 */
+	public AudioInputStream getAudioInputStream(String filename) {
+
+		if (filename == null || "null".equals(filename)) {
+			log.warning("Audio filename is null.");
+			return null;
+		}
+
+		InputStream resourceAsStream =
+				ResourceProvider.getResourceAsStream(filename);
+
+		if (resourceAsStream == null) {
+			log.warning("Audio resource not found: " + filename);
+			return null;
+		}
+
+		return getAudioInputStream(resourceAsStream);
+	}
+
+	/**
+	 * Creates an AudioInputStream from a sound from an input stream
+	 */
+	public AudioInputStream getAudioInputStream(InputStream is) {
+
+	    if (is == null) {
+	        Utilities.log.warning("Null audio input stream.");
+	        return null;
+	    }
+
+	    try {
+	    	System.out.println(
+	    		    "markSupported BEFORE = " + is.markSupported()
+	    		);
+	    	
+	        BufferedInputStream bufferedInput =
+	            new BufferedInputStream(is);
+
+	        System.out.println(
+	        	    "markSupported AFTER = "
+	        	    + bufferedInput.markSupported() );
+	        
+	        return AudioSystem.getAudioInputStream(bufferedInput);
+
+	    } catch (Exception e) {
+	        Utilities.log.warning(
+	            "Unable to decode audio stream: " + e.getMessage()
+	        );
+
+	        e.printStackTrace();
+	        return null;
+	    }
+	}
+	
+	public static SoundManager getInstance() {
+		if (sm == null) {
+			sm = new SoundManager();
+		}
+		return sm;
+	}
+}

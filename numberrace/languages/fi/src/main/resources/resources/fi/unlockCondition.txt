@@ -1,0 +1,3 @@
+Tässä näet kaikki ne eläimet, jotka olet pelastanut!
+
+Tarvitset niitä yhteensä seitsemän vapauttaksesi uuden pelihahmon.

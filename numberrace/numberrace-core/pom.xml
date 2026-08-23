@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>fi.nmi.numberrace</groupId><artifactId>numberrace</artifactId><version>3.1.0</version><relativePath>../pom.xml</relativePath>
+  </parent>
+  <artifactId>numberrace-core</artifactId>
+  <name>NumberRace Core</name>
+  <repositories>
+    <repository><id>numberrace-local</id><url>file://${project.parent.basedir}/legacy-maven-repository</url></repository>
+  </repositories>
+  <build>
+    <defaultGoal>package</defaultGoal>
+    <resources><resource><directory>src/main/resources</directory><filtering>true</filtering></resource></resources>
+    <plugins>
+      <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-jar-plugin</artifactId><version>3.4.2</version><configuration><archive><index>true</index><manifest><mainClass>org.unicog.numberrace.Game</mainClass><addClasspath>true</addClasspath></manifest></archive></configuration></plugin>
+      <plugin><artifactId>maven-compiler-plugin</artifactId><version>3.13.0</version><configuration><encoding>UTF-8</encoding><source>8</source><target>8</target></configuration></plugin>
+      <plugin><artifactId>maven-resources-plugin</artifactId><version>3.3.1</version><configuration><encoding>UTF-8</encoding></configuration></plugin>
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency><groupId>fi.nmi.numberrace</groupId><artifactId>numberrace-res</artifactId><version>3.0.0</version></dependency>
+    <dependency><groupId>fi.nmi</groupId><artifactId>jmat</artifactId><version>5.0-nmi</version></dependency>
+    <dependency><groupId>com.threerings</groupId><artifactId>nenya-media</artifactId><version>rev407</version></dependency>
+    <dependency><groupId>fi.nmi</groupId><artifactId>samskivert</artifactId><version>2272.1</version></dependency>
+    <dependency><groupId>com.googlecode.soundlibs</groupId><artifactId>vorbisspi</artifactId><version>1.0.3.3</version></dependency>
+  </dependencies>
+</project>

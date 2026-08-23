@@ -1,0 +1,11 @@
+Il est TRES IMPORTANT que chaque élève soit enregistré et joue toujours seulement sous son propre nom. Le logiciel adapte au niveau de performance de chaque élève et stock en mémoire son progrès dans les sessions précédentes.
+
+Pour entrer un nouvel élève, cliquez sur «Nouvel élève». Entrez les informations le concernant sur le côté droit de l’écran, choisissez le niveau de difficulté au début (de 1 à 14), et cliquez sur «Entrer».
+
+Pour modifier les informations d’un élève, cliquez sur «Modifier». Changez les détails sur le côté droit de l’écran, puis cliquez sur «Entrer».
+
+Pour supprimer un élève, sélectionnez son nom dans la liste, puis cliquez sur «Supprimer».
+
+Après quelques tours, le logiciel commencera à s’adapter à la performance de l’élève et continuera à le faire tout le long du jeu. Il changera la difficulté des problèmes présentés pour que l’élève réponde correctement 75% du temps.
+
+Si au début vous commencez sur un niveau qui est trop difficile ou facile, vous pouvez toujours quitter par le « menu », supprimer le record de l’élève, et recommencez avec un autre niveau. Si le niveau que vous avez choisi n’est que un peu trop difficile ou facile, ne vous inquiétez pas – le logiciel s’adaptera assez rapidement.

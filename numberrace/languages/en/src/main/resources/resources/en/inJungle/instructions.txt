@@ -1,0 +1,8 @@
+Your journey starts in the jungle!  If you get to the finish before your enemies, you will be allowed to rescue a butterfly.
+
+You will find two palm trees, each with coconuts. You should chose the one which has the most coconuts to go forward that number of squares.
+
+Watch out, there are traps: sometimes your enemies will try to overtake you, or you will come across nasty plants on the squares. If you land on them, you have to go backwards.
+
+
+Click on the flowers to choose your character...
