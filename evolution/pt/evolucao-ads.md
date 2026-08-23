@@ -93,7 +93,7 @@ O projeto pode ser dividido entre diferentes equipes, turmas ou planos de trabal
 - análise da camada de áudio;
 - comparação objetiva antes/depois.
 
-### Frente C — Telemetria
+### Frente C — Registro de Eventos
 
 - modelo de eventos;
 - sessões;
@@ -275,7 +275,7 @@ A solução deve buscar:
 - proteção dos dados;
 - ausência de dependência obrigatória de serviços externos para o funcionamento básico do jogo.
 
-Uma falha de telemetria não deve, sempre que possível, impedir a execução do jogo.
+Uma falha de registro de evento não deve, sempre que possível, impedir a execução do jogo.
 
 ## 12. Estratégia de modernização
 
@@ -390,7 +390,7 @@ A arquitetura deve prever:
 - minimização;
 - pseudonimização;
 - controle de acesso;
-- separação entre identificação e telemetria;
+- separação entre identificação e registro de evento;
 - retenção definida;
 - possibilidade de exclusão quando aplicável;
 - proteção de arquivos exportados;
@@ -426,7 +426,7 @@ No médio prazo, espera-se obter:
 1. base de código mais sustentável;
 2. build reproduzível;
 3. melhor desempenho e responsividade;
-4. arquitetura de telemetria documentada;
+4. arquitetura de registro de eventos documentada;
 5. registros estruturados de interação;
 6. exportação em formatos abertos;
 7. testes automatizados;
@@ -441,7 +441,7 @@ No médio prazo, espera-se obter:
 O projeto poderá originar trabalhos independentes, por exemplo:
 
 - modernização arquitetural de software educacional legado;
-- instrumentação e telemetria em jogos educacionais;
+- instrumentação e registro de eventos em jogos educacionais;
 - arquitetura offline-first para coleta de dados educacionais;
 - visualização da progressão em jogos de matemática;
 - testes automatizados de recursos multilíngues;

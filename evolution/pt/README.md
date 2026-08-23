@@ -2,10 +2,11 @@
 
 Esta pasta reúne as especificações dos projetos de evolução do **The Number Race** desenvolvidos em contexto educacional e de pesquisa.
 
-A evolução foi organizada em duas frentes complementares:
+A evolução está organizada em duas frentes complementares:
 
 - **Projeto Evolução TCC** — destinado inicialmente a estudantes do Ensino Médio Integrado, com foco na adaptação do Number Race ao português brasileiro, modernização da experiência de uso e instrumentação do jogo para registro das interações.
-- **Projeto Evolução ADS** — destinado a estudantes do curso superior de Análise e Desenvolvimento de Sistemas (ADS), com foco na sustentação técnica, modernização arquitetural, telemetria, persistência, qualidade de software e preparação da plataforma para análise de dados.
+
+- **Projeto Evolução ADS** — destinado a estudantes do curso superior de Análise e Desenvolvimento de Sistemas (ADS), com foco na sustentação técnica, modernização arquitetural, registro das interações, persistência, qualidade de software e preparação da plataforma para análise de dados.
 
 Os dois projetos utilizam a mesma base de software, mas possuem escopos e responsabilidades diferentes.
 
@@ -29,12 +30,12 @@ O Number Race **não deve ser apresentado como instrumento de diagnóstico de di
     Projeto Evolução ADS
             |
             | infraestrutura, arquitetura,
-            | qualidade e telemetria
+            | qualidade e persistência de dados
             v
     +-------------------------+
-    |       Number Race       |
-    | modernizado e           |
-    | instrumentado           |
+    |      Number Race       |
+    |      modernizado e      |
+    |      instrumentado      |
     +-------------------------+
             ^
             | localização, interface,
@@ -59,7 +60,7 @@ Toda contribuição deve procurar:
 - manter os créditos, copyrights e termos de licença aplicáveis ao projeto original;
 - documentar alterações relevantes;
 - separar recursos comuns de recursos específicos de idioma;
-- evitar acoplamento desnecessário entre interface, jogo, telemetria e análise;
+- evitar acoplamento desnecessário entre interface, jogo, registros de dados e análise;
 - registrar somente dados necessários aos objetivos definidos;
 - proteger identidade e privacidade dos participantes;
 - não transformar resultados computacionais em diagnósticos clínicos;
@@ -81,4 +82,3 @@ Pull requests devem informar:
 - possíveis trabalhos futuros.
 
 Estes documentos são evolutivos e podem ser refinados conforme o projeto avance. Alterações significativas de objetivos, escopo, requisitos ou responsabilidades devem ser documentadas.
-

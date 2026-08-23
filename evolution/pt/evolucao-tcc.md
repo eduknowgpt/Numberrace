@@ -66,7 +66,7 @@ Adaptar e evoluir o The Number Race, com ênfase na experiência de uso em portu
 - integração e teste de áudios em português;
 - correções diretamente relacionadas à localização;
 - modernização visual incremental;
-- integração com a infraestrutura de telemetria;
+- integração com a infraestrutura de registro de interação;
 - registro de eventos essenciais;
 - exportação ou inspeção dos registros;
 - testes funcionais;
@@ -268,7 +268,7 @@ Como o projeto poderá envolver crianças e dados educacionais, devem ser observ
 - minimização de dados;
 - pseudonimização;
 - controle de acesso;
-- separação entre identificação e telemetria, quando necessária;
+- separação entre identificação e registro de dados, quando necessária;
 - finalidade explícita;
 - retenção definida;
 - proteção dos arquivos;
