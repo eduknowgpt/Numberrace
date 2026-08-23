@@ -81,3 +81,4 @@ Pull requests devem informar:
 - possíveis trabalhos futuros.
 
 Estes documentos são evolutivos e podem ser refinados conforme o projeto avance. Alterações significativas de objetivos, escopo, requisitos ou responsabilidades devem ser documentadas.
+
