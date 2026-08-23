@@ -34,3 +34,18 @@ These modifications do not imply endorsement by the original
 authors or maintainers of The Number Race.
 
 See CHANGELOG.md and the Git history for details.
+
+
+## Assets
+
+The repository contains artwork, audio, textual resources, and
+language-pack resources inherited from the original Number Race
+distribution.
+
+Unless otherwise indicated, these resources are preserved from the
+original project and retain their original copyright and licensing
+notices.
+
+New Brazilian Portuguese resources and other newly created assets
+should identify their respective authors/contributors where
+applicable.
