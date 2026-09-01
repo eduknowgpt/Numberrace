@@ -217,7 +217,7 @@ public class SoundManager {
 
 		for (int i = 0; i < friendNumbers.length; i++) {
 			soundMap.put(
-					"friend1_" + i,
+					"friend1_" + friendNumbers[i],
 					friendNumbersPath + "/" + friendNumbers[i] + ".wav"
 					);
 		}
@@ -236,7 +236,7 @@ public class SoundManager {
 
 		for (int i = 1; i < friendCountingNumbers.length; i++) {
 			soundMap.put(
-					"friend1_counting_" + i,
+					"friend1_counting_" + friendCountingNumbers[i],
 					friendNumbersPath + "/" + friendCountingNumbers[i] + ".wav"
 					);
 		}
