@@ -106,17 +106,61 @@ personagem (6 por mundo).
 
 ---
 
-## 3. Próximas etapas
+## 3. Etapa 2 — Levantamento dos eventos (concluída em 01/10/2026)
+
+**Produto previsto no plano:** catálogo preliminar de eventos de interação.
+**Produto:** [`catalogo-eventos.md`](catalogo-eventos.md).
+
+### 3.1 Atividades realizadas
+
+| Atividade do plano | O que foi feito |
+|---|---|
+| Identificação dos fluxos de interação | Fluxos da Etapa 1 revisados e conferidos jogando |
+| Levantamento dos eventos existentes no código | 25 eventos localizados (arquivo e linha), em 4 grupos: sessão e navegação, partida, rodada e pós-partida |
+| Identificação das informações de cada evento | Informações disponíveis em cada ponto do código, comparadas com o registro atual |
+| Classificação entre dados observados e derivados | Três tipos: observado, contexto e derivado. Todas as colunas do registro atual foram classificadas |
+| Identificação de eventos ausentes ou insuficientes | 10 lacunas do registro atual (catálogo, seção 5) |
+| Organização do catálogo de eventos | `catalogo-eventos.md`, com nomes preliminares e correspondência com os eventos candidatos de `evolucao-ads.md` |
+
+### 3.2 Conferência jogando
+
+- O jogo **facilita** após erros propositais: num arquivo de teste, a rodada 1 estava no nível 9
+  (algarismos e subtração) e a 4 já no nível 1 (pontos, fala e algarismos até 3).
+- Rodada com prazo sem resposta: o adversário fica com o maior e o registro grava erro com
+  `RT = 0`. Rodadas sem prazo aguardam a resposta indefinidamente.
+- Armadilha observada no nível Intermediário, com recuo de 3 casas (penalidade sorteada de 1 a 3).
+- O nível inicial no cadastro é **Fácil, Intermediário ou Difícil** (níveis 1, 8 e 14 de
+  `ccl.properties`), e não "de 1 a 14", como diz o texto de ajuda da tela de cadastro.
+- Teclas: F8 (pausa), Esc (menu), Shift+Esc (encerrar).
+
+### 3.3 Novas observações
+
+| # | Observação | Relação com este projeto |
+|---|---|---|
+| 12 | No arquivo de dados por rodada, os **valores têm uma coluna a mais que o cabeçalho**: a configuração da representação grava 10 valores (inclui `boardLength`), mas o cabeçalho tem 9 nomes. A partir de `controlFor`, as colunas ficam deslocadas | O registro atual não pode ser lido corretamente numa planilha. Reforça a necessidade de um modelo de dados definido e validado |
+| 13 | Há **dois critérios de acerto**: `respCorr` (escolheu o maior) e `finalCorr` (escolha vantajosa considerando armadilhas e colisões). O algoritmo adaptativo usa `finalCorr` | Ambos serão registrados e identificados como derivados (decisão D4) |
+| 14 | Não existe ajuda à criança durante a partida | O evento candidato `HELP_REQUESTED` não se aplica |
+
+### 3.4 Decisões
+
+As quatro decisões de escopo (cliques antes da liberação, granularidade dos movimentos, estado
+do algoritmo e registro do acerto) estão na seção 6 do catálogo, com a justificativa. Podem ser
+revistas pelo orientador.
+
+---
+
+## 4. Andamento das etapas
 
 | Etapa | Descrição | Situação |
 |---|---|---|
-| 2 | Levantamento dos eventos produzidos pelo jogo (catálogo preliminar) | próxima |
-| 3 | Modelagem dos eventos de interação | — |
-| 4 | Estratégia de persistência | — |
-| 5 | Desenvolvimento do componente de registro | — |
-| 6 | Exportação e disponibilização dos dados | — |
-| 7 | Testes, validação e integridade dos registros | — |
-| 8 | Documentação e consolidação | — |
+| 1 | Ambientação no Number Race e preparação do ambiente | Concluída |
+| 2 | Levantamento dos eventos produzidos pelo jogo (catálogo preliminar) | Concluída |
+| 3 | Modelagem dos eventos de interação | Próxima |
+| 4 | Estratégia de persistência | Pendente |
+| 5 | Desenvolvimento do componente de registro | Pendente |
+| 6 | Exportação e disponibilização dos dados | Pendente |
+| 7 | Testes, validação e integridade dos registros | Pendente |
+| 8 | Documentação e consolidação | Pendente |
 
 ---
 
