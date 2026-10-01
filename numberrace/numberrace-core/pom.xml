@@ -8,7 +8,7 @@
   <artifactId>numberrace-core</artifactId>
   <name>NumberRace Core</name>
   <repositories>
-    <repository><id>numberrace-local</id><url>file://${project.parent.basedir}/legacy-maven-repository</url></repository>
+    <repository><id>numberrace-local</id><url>${project.baseUri}../legacy-maven-repository</url></repository>
   </repositories>
   <build>
     <defaultGoal>package</defaultGoal>
