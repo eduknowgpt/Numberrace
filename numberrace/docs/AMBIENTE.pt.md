@@ -67,8 +67,8 @@ Os dados das partidas ficam em `%USERPROFILE%\NumberRace\v3\Data`.
 
 ## Nota sobre o desenvolvimento
 
-Este trabalho foi feito por Sávio, como parte da ACC "Modelagem, registro e persistência de
-dados de interação no Number Race", com apoio de uma ferramenta de inteligência artificial
+Este trabalho foi feito por Sávio, como parte do projeto "Modelagem, registro e persistência
+de dados de interação no Number Race", com apoio de uma ferramenta de inteligência artificial
 (Claude, da Anthropic) na análise do código, na preparação das correções e na redação desta
 documentação. As alterações foram acompanhadas por ele e testadas no ambiente Windows
 descrito acima.
