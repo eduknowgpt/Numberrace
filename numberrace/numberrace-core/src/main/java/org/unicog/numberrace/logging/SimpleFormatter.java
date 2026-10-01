@@ -21,11 +21,8 @@ public class SimpleFormatter extends Formatter {
     private String lineSeparator;
 
     public SimpleFormatter() {
-        lineSeparator = (String) java.security.AccessController.doPrivileged(new sun.security.action.GetPropertyAction(
-                "line.separator"));
+        lineSeparator = System.getProperty("line.separator");
     }
-
-    //  private String lineSeparator = System.getProperty("line.separator");
 
     public String format(LogRecord record) {
         StringBuilder sb = new StringBuilder();
