@@ -49,6 +49,8 @@ O Projeto Evolução ADS fornece infraestrutura que pode ser utilizada pelo TCC 
 
 - [Projeto Evolução TCC](evolucao-tcc.md)
 - [Projeto Evolução ADS](evolucao-ads.md)
+- [Dados de interação: registro de trabalho](registro-dados-interacao.md)
+- [Catálogo preliminar de eventos de interação](catalogo-eventos.md)
 
 ## Princípios de evolução
 
