@@ -33,7 +33,7 @@ inicial do funcionamento do Number Race.
 | Configurar o repositório e o versionamento | Fork `saviosant0s/Numberrace`, ramo `correcao-build` e Pull Request #1 para este repositório |
 | Registrar o ambiente e os procedimentos | `numberrace/docs/AMBIENTE.pt.md` e este documento |
 
-### 2.2 Problemas que impediam compilar ou executar (corrigidos neste Pull Request)
+### 2.2 Problemas que impediam compilar ou executar (corrigidos no Pull Request #1)
 
 | # | Problema | Como foi identificado | Correção |
 |---|---|---|---|
@@ -149,18 +149,69 @@ revistas pelo orientador.
 
 ---
 
-## 4. Andamento das etapas
+## 4. Etapa 3 — Modelagem dos eventos de interação (concluída em 02/10/2026)
+
+**Produto previsto no plano:** especificação do modelo de eventos de interação.
+**Produto:** [`modelo-eventos.md`](modelo-eventos.md), acompanhado do schema
+[`modelo-eventos.schema.json`](modelo-eventos.schema.json) e de uma sessão simulada de exemplo
+([`modelo-eventos-exemplos.json`](modelo-eventos-exemplos.json)).
+
+### 4.1 Atividades realizadas
+
+| Atividade do plano | O que foi feito |
+|---|---|
+| Definição dos campos dos eventos | Parte comum a todos os eventos (11 campos) e parte específica de 23 tipos de evento, com a classificação em observado, contexto ou derivado e a correspondência com as colunas do registro atual |
+| Definição dos tipos de dados | Dez tipos (texto, categoria, identificador, data e hora, inteiro, real, lógico, nulo, objeto e lista) e convenções para nomes, unidades e data e hora |
+| Definição de identificadores | UUID para evento e sessão; código pseudonimizado para o participante; números de partida, de rodada e de sequência |
+| Modelagem de sessão e eventos | Hierarquia participante, sessão, partida, rodada e evento; sequência típica de uma rodada, com a origem de cada evento no código |
+| Análise de extensibilidade do modelo | Versionamento no formato MAIOR.MENOR, leitura tolerante a campos desconhecidos e pontos de extensão previstos |
+| Documentação do modelo | `modelo-eventos.md` e o modelo em JSON Schema, validado com a sessão de exemplo |
+
+### 4.2 Principais resultados
+
+- O tempo de resposta passa a ser medido **desde a liberação da resposta**. O tempo contado
+  desde o primeiro estímulo, equivalente à coluna `RT` atual, também é registrado, para
+  permitir a comparação com dados antigos.
+- O prazo esgotado passa a ter **evento próprio** (`ANSWER_TIMEOUT`), em vez de `RT = 0`.
+- O participante é identificado apenas por **código pseudonimizado**; o nome não aparece nos
+  dados.
+- Cada valor é gravado **com o seu nome**, o que elimina o problema das colunas deslocadas
+  (observação 12).
+- Estímulo, resposta e resultado são **eventos separados**, porque ocorrem em instantes
+  diferentes; a visão com uma linha por rodada será produzida na exportação (Etapa 6).
+- **Validação:** os 44 eventos da sessão de exemplo são válidos; oito eventos com erros
+  propositais (campo ausente, tipo inexistente, valor negativo, nome de campo errado, entre
+  outros) foram rejeitados.
+- **Conferência com dados reais:** uma rodada de um arquivo de teste do jogo atual (prazo
+  esgotado) foi convertida para o modelo e validada. A conferência mostrou que as armadilhas
+  permanecem no tabuleiro entre rodadas, mesmo quando o nível da rodada não prevê armadilhas, e
+  o modelo foi ajustado para registrar todas as armadilhas presentes, com a respectiva
+  penalidade (modelo, seção 10).
+
+### 4.3 Decisões
+
+As dez decisões de modelagem (D5 a D14) estão na seção 13 do modelo, com a justificativa. Entre
+elas: o estilo dos nomes de campos segue a tabela "Modelo inicial" do plano (*snake_case*, como
+`event_id`), e não o exemplo de `evolucao-ads.md` (*camelCase*, como `responseTimeMs`) (D6).
+Podem ser revistas pelo orientador.
+
+---
+
+## 5. Andamento das etapas
 
 | Etapa | Descrição | Situação |
 |---|---|---|
 | 1 | Ambientação no Number Race e preparação do ambiente | Concluída |
 | 2 | Levantamento dos eventos produzidos pelo jogo (catálogo preliminar) | Concluída |
-| 3 | Modelagem dos eventos de interação | Próxima |
-| 4 | Estratégia de persistência | Pendente |
+| 3 | Modelagem dos eventos de interação | Concluída |
+| 4 | Estratégia de persistência | Próxima |
 | 5 | Desenvolvimento do componente de registro | Pendente |
 | 6 | Exportação e disponibilização dos dados | Pendente |
 | 7 | Testes, validação e integridade dos registros | Pendente |
 | 8 | Documentação e consolidação | Pendente |
+
+As Etapas 1 e 2 foram incorporadas a este repositório pelo Pull Request #1 (01/10/2026). A partir
+da Etapa 3, cada etapa é apresentada em um Pull Request próprio.
 
 ---
 
