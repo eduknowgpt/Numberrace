@@ -25,5 +25,8 @@
     <dependency><groupId>com.threerings</groupId><artifactId>nenya-media</artifactId><version>rev407</version></dependency>
     <dependency><groupId>fi.nmi</groupId><artifactId>samskivert</artifactId><version>2272.1</version></dependency>
     <dependency><groupId>com.googlecode.soundlibs</groupId><artifactId>vorbisspi</artifactId><version>1.0.3.3</version></dependency>
+    <!-- Registro de interação (cópia para consulta em SQLite; ver evolution/pt/persistencia-eventos.md) -->
+    <dependency><groupId>org.xerial</groupId><artifactId>sqlite-jdbc</artifactId><version>3.53.4.0</version></dependency>
+    <dependency><groupId>junit</groupId><artifactId>junit</artifactId><version>4.13.2</version><scope>test</scope></dependency>
   </dependencies>
 </project>
