@@ -201,6 +201,7 @@ public class GameObject extends NumCompListener {
                 GameObject.this.opponentCharacter = randomNumber.nextInt(4);
                 GameObject.this.getChoiceScreen()
                                .setOpponentCharacter(GameObject.this.opponentCharacter);
+                GameEvents.characterSelected(character, GameObject.this.opponentCharacter);
 
                 GameObject.this.changeState(GameStates.CHOICE);
             } else {
@@ -323,6 +324,7 @@ public class GameObject extends NumCompListener {
                 currentState = tmpState;
                 unpause();
                 if (newState == GameStates.MENU) {
+                    GameEvents.resumed("menu", currentState);
                     return;
                 }
             }
@@ -332,6 +334,7 @@ public class GameObject extends NumCompListener {
                 taskQueue.reset();
                 soundManager.stopAllSounds();
             } else {
+                GameEvents.paused("menu", currentState);
                 pause();
             }
 
@@ -398,6 +401,7 @@ public class GameObject extends NumCompListener {
 
         Utilities.log.info("Changin states : [" + currentState.name()
                 + "] -> [" + newState.name() + "]");
+        GameEvents.screenChanged(currentState, newState);
         //        switch (currentState) {
         //        case START:
         //            //            switch (newState) {
@@ -1048,6 +1052,7 @@ public class GameObject extends NumCompListener {
 
     public void setTheme(byte theme) {
         getTheme().setLevel(theme);
+        GameEvents.themeSelected(theme);
     }
 
     public NRRunnableQueue getTaskQueue() {
@@ -1196,7 +1201,11 @@ public class GameObject extends NumCompListener {
             if (!transition) {
                 if (currentState != GameStates.MENU && paused) {
                     unpause();
+                    GameEvents.resumed("pause_key", currentState);
                 } else {
+                    if (!paused) {
+                        GameEvents.paused("pause_key", currentState);
+                    }
                     pause();
                 }
             }

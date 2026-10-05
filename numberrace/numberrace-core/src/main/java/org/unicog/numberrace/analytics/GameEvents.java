@@ -20,6 +20,7 @@ import org.unicog.numberrace.managers.HazardManager;
 import org.unicog.numberrace.setup.GamePreferences;
 import org.unicog.numberrace.util.Constants;
 import org.unicog.numberrace.util.Messages;
+import org.unicog.numberrace.vars.ThemeVariables;
 
 /**
  * Ponte entre o jogo e o componente de registro: traduz o que acontece no jogo em eventos do
@@ -37,6 +38,8 @@ public final class GameEvents {
     private static String pendingEndReason;
     private static long leftStimulusNanos;
     private static long responseEnabledNanos;
+    private static int tooFarAttempts;
+    private static boolean pauseOpen;
 
     private GameEvents() {
     }
@@ -69,6 +72,7 @@ public final class GameEvents {
             gamesInSession = 0;
             gameInProgress = false;
             pendingEndReason = null;
+            pauseOpen = false;
             LOGGER.startSession(participant, Json.obj(
                     "session_number", Integer.valueOf(student.getSessionNumber()),
                     "start_level", startLevel(student.getStartLevel(), startComplexityLevel),
@@ -91,6 +95,7 @@ public final class GameEvents {
                     "screen", screenName(screen),
                     "game_in_progress", Boolean.valueOf(gameInProgress)));
             gameInProgress = false;
+            pauseOpen = false;
         } catch (Throwable t) {
             fail("sessionEnded", t);
         }
@@ -108,6 +113,87 @@ public final class GameEvents {
             LOGGER.shutdown(2000);
         } catch (Throwable t) {
             fail("applicationStopping", t);
+        }
+    }
+
+    // ------------------------------------------------------------------ navegação
+
+    public static void screenChanged(GameStates from, GameStates to) {
+        try {
+            if (from == null || to == null || from == to) {
+                return;
+            }
+            LOGGER.log(EventType.SCREEN_CHANGED, Json.obj(
+                    "from_screen", screenName(from),
+                    "to_screen", screenName(to)));
+        } catch (Throwable t) {
+            fail("screenChanged", t);
+        }
+    }
+
+    public static void themeSelected(byte theme) {
+        try {
+            LOGGER.log(EventType.THEME_SELECTED, Json.obj("theme", themeName(theme)));
+        } catch (Throwable t) {
+            fail("themeSelected", t);
+        }
+    }
+
+    public static void characterSelected(int playerCharacter, int opponentCharacter) {
+        try {
+            LOGGER.log(EventType.CHARACTER_SELECTED, Json.obj(
+                    "player_character", Integer.valueOf(playerCharacter),
+                    "opponent_character", Integer.valueOf(opponentCharacter)));
+        } catch (Throwable t) {
+            fail("characterSelected", t);
+        }
+    }
+
+    /** Pausa pela tecla F8 ({@code pause_key}) ou pela abertura do menu ({@code menu}). */
+    public static void paused(String trigger, GameStates screen) {
+        try {
+            if (pauseOpen || !LOGGER.inSession()) {
+                return;
+            }
+            pauseOpen = true;
+            LOGGER.log(EventType.PAUSE, Json.obj("trigger", trigger, "screen", screenName(screen)));
+        } catch (Throwable t) {
+            fail("paused", t);
+        }
+    }
+
+    public static void resumed(String trigger, GameStates screen) {
+        try {
+            if (!pauseOpen) {
+                return;
+            }
+            pauseOpen = false;
+            LOGGER.log(EventType.RESUME, Json.obj("trigger", trigger, "screen", screenName(screen)));
+        } catch (Throwable t) {
+            fail("resumed", t);
+        }
+    }
+
+    public static void rewardSaved(int rewardType, byte theme) {
+        try {
+            LOGGER.log(EventType.REWARD_SAVED, Json.obj(
+                    "reward_type", Integer.valueOf(rewardType),
+                    "theme", themeName(theme)));
+        } catch (Throwable t) {
+            fail("rewardSaved", t);
+        }
+    }
+
+    public static void characterUnlocked(int character, byte theme) {
+        try {
+            if (character < 0) {
+                return;
+            }
+            LOGGER.log(EventType.CHARACTER_UNLOCKED, Json.obj(
+                    "character", Integer.valueOf(character),
+                    "theme", themeName(theme)));
+        } catch (Throwable t) {
+            fail("characterUnlocked", t);
         }
     }
 
@@ -170,6 +256,7 @@ public final class GameEvents {
         try {
             GameObject go = GameObject.getInstance();
             LOGGER.beginTurn(turn.getTurnNumber());
+            tooFarAttempts = 0;
             LOGGER.log(EventType.TURN_START, Json.obj(
                     "complexity_level", Integer.valueOf(turn.getCurrentNotnLevel() + 1),
                     "representation", Json.obj(
@@ -226,6 +313,21 @@ public final class GameEvents {
         }
     }
 
+    /**
+     * Clique num lado antes da liberação da resposta (ignorado pelo jogo). Registro opcional
+     * (decisão D1): desligado com {@code -Dnumberrace.analytics.clickIgnored=false}.
+     */
+    public static void clickIgnored(int side) {
+        try {
+            if (Boolean.parseBoolean(System.getProperty("numberrace.analytics.clickIgnored", "true"))
+                    && LOGGER.inTurn()) {
+                LOGGER.log(EventType.CLICK_IGNORED, Json.obj("side", side(side)));
+            }
+        } catch (Throwable t) {
+            fail("clickIgnored", t);
+        }
+    }
+
     /** Resposta da criança, já com o resultado calculado pelo jogo. Registra também TURN_RESULT. */
     public static void answered(GameTurn turn, int side) {
         try {
@@ -263,6 +365,65 @@ public final class GameEvents {
                         turn.getSquaresMovedBack()),
                 "hypothetical_outcome", outcome(turn.getHypRelNetGain(), turn.getHypNetGain(),
                         turn.getHypSquaresMovedForward(), turn.getHypSquaresMovedBack())));
+    }
+
+    // ------------------------------------------------------------------ tabuleiro
+
+    /** A criança clicou numa casa além da permitida durante um movimento. */
+    public static void moveTooFar() {
+        tooFarAttempts++;
+    }
+
+    /** Um personagem chegou à casa de destino do movimento. */
+    public static void moved(int pieceId, int fromSquare, int toSquare, int steps) {
+        try {
+            LOGGER.log(EventType.MOVE, Json.obj(
+                    "piece", piece(pieceId),
+                    "from_square", Integer.valueOf(fromSquare),
+                    "to_square", Integer.valueOf(toSquare),
+                    "steps", Integer.valueOf(steps),
+                    "too_far_attempts", Integer.valueOf(tooFarAttempts)));
+        } catch (Throwable t) {
+            fail("moved", t);
+        } finally {
+            tooFarAttempts = 0;
+        }
+    }
+
+    /** Esbarrão: o personagem {@code pushedId} volta uma casa. */
+    public static void collision(int pushedId, int square) {
+        try {
+            LOGGER.log(EventType.COLLISION, Json.obj(
+                    "pushed_piece", piece(pushedId),
+                    "from_square", Integer.valueOf(square),
+                    "to_square", Integer.valueOf(Math.max(0, square - 1))));
+        } catch (Throwable t) {
+            fail("collision", t);
+        }
+    }
+
+    /** Armadilha: {@code penalty} é negativo no jogo (casas de recuo). */
+    public static void hazard(int pieceId, int square, int penalty) {
+        try {
+            LOGGER.log(EventType.HAZARD, Json.obj(
+                    "piece", piece(pieceId),
+                    "square", Integer.valueOf(square),
+                    "penalty", Integer.valueOf(Math.abs(penalty)),
+                    "to_square", Integer.valueOf(Math.max(0, square - Math.abs(penalty)))));
+        } catch (Throwable t) {
+            fail("hazard", t);
+        }
+    }
+
+    /** Fala do adversário apresentada à criança (nome do áudio). */
+    public static void feedback(String messageKey) {
+        try {
+            if (LOGGER.inTurn()) {
+                LOGGER.log(EventType.FEEDBACK_PRESENTED, Json.obj("message_key", messageKey));
+            }
+        } catch (Throwable t) {
+            fail("feedback", t);
+        }
     }
 
     // ------------------------------------------------------------------ auxiliares
@@ -306,6 +467,10 @@ public final class GameEvents {
             return "choice";
         }
         return state.name().toLowerCase(Locale.ROOT);
+    }
+
+    static String themeName(byte theme) {
+        return theme == ThemeVariables.UNDER_THE_SEA ? "under_the_sea" : "jungle";
     }
 
     static String startLevel(String level, int complexityLevel) {

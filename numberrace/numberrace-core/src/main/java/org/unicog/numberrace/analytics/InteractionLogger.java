@@ -106,6 +106,12 @@ public final class InteractionLogger {
         }
     }
 
+    public boolean inTurn() {
+        synchronized (lock) {
+            return gameNumber != null && turnNumber != null;
+        }
+    }
+
     /** Código pseudonimizado do participante (criado na primeira vez). */
     public String participantCodeFor(String lastName, String firstName) {
         ParticipantRegistry r = registry;

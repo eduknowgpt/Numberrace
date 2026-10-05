@@ -1,5 +1,6 @@
 package org.unicog.numberrace.screens;
 
+import org.unicog.numberrace.analytics.GameEvents;
 import static org.unicog.numberrace.screens.ActionState.SNEAK;
 import static org.unicog.numberrace.screens.ScaleUtils.i;
 
@@ -354,6 +355,7 @@ public class ChoiceScreen extends VirtualMediaPanel implements Screen,
                         soundManager.stopAllSounds();
                         if (number > finalTarged) {
                             Utilities.log.info("too far");
+                            GameEvents.moveTooFar();
                             opponentTalks("enemy1_playerTooFar");
                         } else {
                             int tmp = number - player.tmpBoardPosition;
@@ -384,6 +386,7 @@ public class ChoiceScreen extends VirtualMediaPanel implements Screen,
 
                             if (number == finalTarged) {
                                 Utilities.log.info("bull's eye!");
+                                GameEvents.moved(Constants.PLAYER1, player.boardPosition, finalTarged, player.steps);
                                 // use numeric sound files
 
                                 soundManager.play(Utilities.charac4id(Constants.PLAYER1)
@@ -424,6 +427,7 @@ public class ChoiceScreen extends VirtualMediaPanel implements Screen,
                         soundManager.stopAllSounds();
                         if (number > finalTarged) {
                             Utilities.log.info("too far");
+                            GameEvents.moveTooFar();
                             opponentTalks("enemy1_opponentTooFar");
                         } else {
                             int tmp = number - opponent.tmpBoardPosition;
@@ -455,6 +459,7 @@ public class ChoiceScreen extends VirtualMediaPanel implements Screen,
 
                             if (number == finalTarged) {
                                 Utilities.log.info("bull's eye!");
+                                GameEvents.moved(Constants.PLAYER2, opponent.boardPosition, finalTarged, opponent.steps);
                                 // use numeric soun files
                                 soundManager.play(Utilities.charac4id(Constants.PLAYER2)
                                                           + (opponent.tmpBoardPosition),
@@ -594,6 +599,15 @@ public class ChoiceScreen extends VirtualMediaPanel implements Screen,
         return new MediaPanel.ActionSpriteHandler() {
             public void mousePressed(MouseEvent me) {
 
+                if (currentState == ActionState.TURN_START) {
+                    // clique antes da liberação da resposta: o jogo ignora, o registro anota
+                    if (gameArea.getLeftDotContainer().getBounds().contains(me.getPoint())) {
+                        GameEvents.clickIgnored(Constants.LEFT);
+                    } else if (gameArea.getRightDotContainer().getBounds().contains(me.getPoint())) {
+                        GameEvents.clickIgnored(Constants.RIGHT);
+                    }
+                }
+
                 if (_activeSprite == null) {
                     // see if we can find one
                     Sprite s = getHit(me);
@@ -646,6 +660,7 @@ public class ChoiceScreen extends VirtualMediaPanel implements Screen,
 
         if (activeCharacter == player) {
             if (opponent.boardPosition == player.boardPosition) {
+                GameEvents.collision(Constants.PLAYER2, opponent.boardPosition);
                 setActiveCharacter(opponent);
                 opponentTalks("enemy1_youSentMeBack", new SoundListener() {
 
@@ -662,6 +677,7 @@ public class ChoiceScreen extends VirtualMediaPanel implements Screen,
                 if (hazardSprite != null) {
 
                     final int penalty = hazardSprite.getPenaltyValue();
+                    GameEvents.hazard(Constants.PLAYER1, player.boardPosition, penalty);
 
                     final SoundListener l = new SoundListener() {
 
@@ -714,6 +730,7 @@ public class ChoiceScreen extends VirtualMediaPanel implements Screen,
             }
         } else if (activeCharacter == opponent) {
             if (opponent.boardPosition == player.boardPosition) {
+                GameEvents.collision(Constants.PLAYER1, player.boardPosition);
                 setActiveCharacter(player);
                 opponentTalks("enemy1_youHaveToGoBack", new SoundListener() {
 
@@ -728,6 +745,7 @@ public class ChoiceScreen extends VirtualMediaPanel implements Screen,
                 final HazardSprite hazardSprite = hzm.checkForCollisions(opponent.boardPosition);
                 if (hazardSprite != null) {
                     final int penalty = hazardSprite.getPenaltyValue();
+                    GameEvents.hazard(Constants.PLAYER2, opponent.boardPosition, penalty);
 
                     final SoundListener l = new SoundListener() {
 
@@ -1597,10 +1615,12 @@ public class ChoiceScreen extends VirtualMediaPanel implements Screen,
     }
 
     public void opponentTalks(String remark) {
+        GameEvents.feedback(remark);
         talk(opponentSprite, remark, stopTalkingOpponent);
     }
 
     public void opponentTalks(String remark, final SoundListener l) {
+        GameEvents.feedback(remark);
         talk(opponentSprite, remark, new SoundListener() {
 
             public void run() {

@@ -1,5 +1,6 @@
 package org.unicog.numberrace.screens;
 
+import org.unicog.numberrace.analytics.GameEvents;
 import static org.unicog.numberrace.screens.ScaleUtils.i;
 
 import java.awt.Point;
@@ -34,6 +35,7 @@ public class SaveScreen extends VirtualMediaPanel implements Screen,
                     public void run() {
                         go.getStudent().addReward(rewardType,
                                                   ThemeVariables.getLevel());
+                        GameEvents.rewardSaved(rewardType, ThemeVariables.getLevel());
                         go.getSoundManager().play("iconClick");
                         go.getDataFileHandler().saveGame();
                         go.changeState(GameStates.ZOO);
