@@ -1,10 +1,6 @@
 package org.unicog.numberrace.analytics;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -22,9 +18,6 @@ import java.util.logging.Logger;
 final class SqliteSink implements EventSink {
 
     private static final Logger LOG = Logger.getLogger("org.unicog.numberrace.analytics");
-    private static final String INSERT = "INSERT INTO event (event_id, schema_version, event_type, timestamp, "
-            + "session_id, participant_id, sequence_number, activity, game_number, turn_number, event_json) "
-            + "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
     private final File dbFile;
     private final File nativeDir;
@@ -95,40 +88,13 @@ final class SqliteSink implements EventSink {
         connection = DriverManager.getConnection("jdbc:sqlite:" + dbFile.getAbsolutePath());
         Statement s = connection.createStatement();
         try {
-            for (String sql : schemaStatements()) {
+            for (String sql : SqliteSchema.statements()) {
                 s.execute(sql);
             }
         } finally {
             s.close();
         }
-        insert = connection.prepareStatement(INSERT);
-    }
-
-    static String[] schemaStatements() throws IOException {
-        InputStream in = SqliteSink.class.getResourceAsStream("schema.sql");
-        if (in == null) {
-            throw new IOException("schema.sql não encontrado");
-        }
-        StringBuilder sb = new StringBuilder();
-        Reader r = new InputStreamReader(in, "UTF-8");
-        try {
-            char[] buf = new char[4096];
-            int n;
-            while ((n = r.read(buf)) > 0) {
-                sb.append(buf, 0, n);
-            }
-        } finally {
-            r.close();
-        }
-        String noComments = sb.toString().replaceAll("(?m)^\\s*--.*$", "");
-        String[] parts = noComments.split(";");
-        java.util.List<String> statements = new java.util.ArrayList<String>();
-        for (String p : parts) {
-            if (p.trim().length() > 0) {
-                statements.add(p.trim());
-            }
-        }
-        return statements.toArray(new String[statements.size()]);
+        insert = connection.prepareStatement(SqliteSchema.INSERT_EVENT);
     }
 
     public void sessionEnded(String sessionId) {

@@ -1,13 +1,15 @@
 package org.unicog.numberrace.analytics;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
- * Escrita mínima de JSON (sem bibliotecas externas), suficiente para os eventos do modelo.
- * Objetos são {@link Map} (a ordem das chaves é mantida com {@link LinkedHashMap}).
+ * Escrita e leitura mínimas de JSON (sem bibliotecas externas), suficientes para os eventos do
+ * modelo. Objetos são {@link Map} (a ordem das chaves é mantida com {@link LinkedHashMap}).
  */
 public final class Json {
 
@@ -30,6 +32,23 @@ public final class Json {
         StringBuilder sb = new StringBuilder();
         append(sb, value);
         return sb.toString();
+    }
+
+    /**
+     * Lê um texto JSON. Objetos viram {@link LinkedHashMap}, listas viram {@link ArrayList},
+     * números inteiros viram {@link Long} e os demais números, {@link Double}.
+     *
+     * @throws IllegalArgumentException se o texto não for JSON válido
+     */
+    public static Object parse(String text) {
+        Parser p = new Parser(text);
+        p.skipSpaces();
+        Object value = p.value();
+        p.skipSpaces();
+        if (p.pos != text.length()) {
+            throw p.error("conteúdo depois do fim do JSON");
+        }
+        return value;
     }
 
     private static void append(StringBuilder sb, Object v) {
@@ -117,5 +136,208 @@ public final class Json {
             }
         }
         sb.append('"');
+    }
+
+    private static final class Parser {
+
+        private final String s;
+        private int pos;
+
+        Parser(String s) {
+            this.s = s;
+        }
+
+        Object value() {
+            if (pos >= s.length()) {
+                throw error("fim inesperado");
+            }
+            char c = s.charAt(pos);
+            if (c == '{') {
+                return object();
+            } else if (c == '[') {
+                return array();
+            } else if (c == '"') {
+                return string();
+            } else if (c == '-' || (c >= '0' && c <= '9')) {
+                return number();
+            } else if (s.startsWith("true", pos)) {
+                pos += 4;
+                return Boolean.TRUE;
+            } else if (s.startsWith("false", pos)) {
+                pos += 5;
+                return Boolean.FALSE;
+            } else if (s.startsWith("null", pos)) {
+                pos += 4;
+                return null;
+            }
+            throw error("valor inesperado");
+        }
+
+        private Map<String, Object> object() {
+            Map<String, Object> map = new LinkedHashMap<String, Object>();
+            pos++; // {
+            skipSpaces();
+            if (peek() == '}') {
+                pos++;
+                return map;
+            }
+            while (true) {
+                skipSpaces();
+                if (peek() != '"') {
+                    throw error("nome de campo esperado");
+                }
+                String key = string();
+                skipSpaces();
+                expect(':');
+                skipSpaces();
+                map.put(key, value());
+                skipSpaces();
+                char c = next();
+                if (c == '}') {
+                    return map;
+                } else if (c != ',') {
+                    throw error("',' ou '}' esperado");
+                }
+            }
+        }
+
+        private List<Object> array() {
+            List<Object> list = new ArrayList<Object>();
+            pos++; // [
+            skipSpaces();
+            if (peek() == ']') {
+                pos++;
+                return list;
+            }
+            while (true) {
+                skipSpaces();
+                list.add(value());
+                skipSpaces();
+                char c = next();
+                if (c == ']') {
+                    return list;
+                } else if (c != ',') {
+                    throw error("',' ou ']' esperado");
+                }
+            }
+        }
+
+        private String string() {
+            pos++; // "
+            StringBuilder sb = new StringBuilder();
+            while (true) {
+                char c = next();
+                if (c == '"') {
+                    return sb.toString();
+                } else if (c == '\\') {
+                    char e = next();
+                    switch (e) {
+                    case '"':
+                    case '\\':
+                    case '/':
+                        sb.append(e);
+                        break;
+                    case 'b':
+                        sb.append('\b');
+                        break;
+                    case 'f':
+                        sb.append('\f');
+                        break;
+                    case 'n':
+                        sb.append('\n');
+                        break;
+                    case 'r':
+                        sb.append('\r');
+                        break;
+                    case 't':
+                        sb.append('\t');
+                        break;
+                    case 'u':
+                        if (pos + 4 > s.length()) {
+                            throw error("escape \\u incompleto");
+                        }
+                        try {
+                            sb.append((char) Integer.parseInt(s.substring(pos, pos + 4), 16));
+                        } catch (NumberFormatException ex) {
+                            throw error("escape \\u inválido");
+                        }
+                        pos += 4;
+                        break;
+                    default:
+                        throw error("escape inválido");
+                    }
+                } else if (c < 0x20) {
+                    throw error("caractere de controle dentro de texto");
+                } else {
+                    sb.append(c);
+                }
+            }
+        }
+
+        private Object number() {
+            int start = pos;
+            boolean decimal = false;
+            if (peek() == '-') {
+                pos++;
+            }
+            while (pos < s.length()) {
+                char c = s.charAt(pos);
+                if (c >= '0' && c <= '9') {
+                    pos++;
+                } else if (c == '.' || c == 'e' || c == 'E' || c == '+' || c == '-') {
+                    decimal = true;
+                    pos++;
+                } else {
+                    break;
+                }
+            }
+            String n = s.substring(start, pos);
+            try {
+                if (!decimal) {
+                    try {
+                        return Long.valueOf(n);
+                    } catch (NumberFormatException tooBig) {
+                        return Double.valueOf(n);
+                    }
+                }
+                return Double.valueOf(n);
+            } catch (NumberFormatException ex) {
+                throw error("número inválido: " + n);
+            }
+        }
+
+        void skipSpaces() {
+            while (pos < s.length()) {
+                char c = s.charAt(pos);
+                if (c == ' ' || c == '\t' || c == '\n' || c == '\r') {
+                    pos++;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        private char peek() {
+            if (pos >= s.length()) {
+                throw error("fim inesperado");
+            }
+            return s.charAt(pos);
+        }
+
+        private char next() {
+            char c = peek();
+            pos++;
+            return c;
+        }
+
+        private void expect(char c) {
+            if (next() != c) {
+                throw error("'" + c + "' esperado");
+            }
+        }
+
+        IllegalArgumentException error(String message) {
+            return new IllegalArgumentException("JSON inválido na posição " + pos + ": " + message);
+        }
     }
 }
