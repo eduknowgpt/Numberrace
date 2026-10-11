@@ -33,7 +33,8 @@ final class Fixture {
             while ((n = in.read(buf, off, buf.length - off)) > 0) {
                 off += n;
             }
-            String text = new String(buf, 0, off, UTF8);
+            // no Windows, o Git pode converter o fim de linha para CRLF ao baixar o arquivo
+            String text = new String(buf, 0, off, UTF8).replace("\r\n", "\n");
             return new ArrayList<String>(Arrays.asList(text.split("\n")));
         } finally {
             in.close();
