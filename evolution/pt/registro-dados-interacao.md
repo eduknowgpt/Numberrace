@@ -326,7 +326,64 @@ justificativa. Podem ser revistas pelo orientador.
 
 ---
 
-## 8. Andamento das etapas
+## 8. Etapa 7 — Testes, validação e integridade dos registros (concluída em 11/10/2026)
+
+**Produto previsto no plano:** conjunto de testes e relatório de validação técnica dos registros.
+**Produto:** verificação de integridade incorporada ao exportador, testes automatizados, gerador
+de sessões simuladas e relatório [`validacao-registros.md`](validacao-registros.md).
+
+### 8.1 Atividades realizadas
+
+| Atividade do plano | O que foi feito |
+|---|---|
+| Elaboração dos cenários de teste | 22 cenários, cobrindo todos os itens do plano, com o resultado esperado definido antes da execução |
+| Criação de dados simulados | Gerador de sessões (semente fixa, todos os 23 tipos de evento, vários participantes e sessões) e execução do jogo real por um programa de teste |
+| Testes do registro | Execução do jogo por programa (armadilhas, recompensas, novo personagem, pausas por tecla, menu e perda de foco, sessão fechada à força) e roteiro no Windows |
+| Testes de persistência | Cinco falhas simuladas: fechamento à força, banco bloqueado, pasta impossível de criar, disco cheio e relógio atrasado |
+| Testes de exportação | Exportação dos dados gerados e dos dados do jogo, conferida também por um programa independente em Python |
+| Análise de integridade e completude | Verificação com 21 regras incorporada ao exportador; 18 alterações propositais da sessão de teste, todas detectadas pela regra esperada |
+| Correção dos problemas encontrados | Nove problemas registrados; seis corrigidos e três documentados (seção 10 de `validacao-registros.md`) |
+
+### 8.2 Principais resultados
+
+- O exportador confere 21 regras em toda exportação e entrega o resultado no próprio pacote
+  (relatório em texto, tabela `integrity` e colunas na tabela de sessões), separando erros (dados
+  incoerentes) de avisos (situações com possível explicação legítima, como o relógio do
+  computador ajustado ou o jogo fechado à força).
+- A sessão de teste da Etapa 5 não apresentou nenhum problema; as 18 alterações propositais foram
+  todas detectadas.
+- **Problemas encontrados e corrigidos:** ordem dos eventos no prazo esgotado; numeração das
+  recompensas fora do intervalo do modelo (geraria eventos inválidos); pausa por perda de foco da
+  janela não registrada, inclusive quando ela retomava um jogo pausado pela tecla F8; evento
+  perdido após uma gravação interrompida por falta de espaço; modo de exibição não preenchido.
+  **Documentados:** o tempo de resposta inclui o tempo em pausa; o tempo de resposta do registro
+  atual usa o relógio do computador; nos níveis com números falados, o jogo não reproduz os
+  números do personagem da criança (defeito do jogo, fora do componente de registro), de modo que
+  `representation.spoken` indica a condição prevista e não a reprodução do som.
+- **Versão 1.1 do modelo de eventos:** novo valor `window_focus` em `PAUSE` e `RESUME`. A versão
+  1.0 continua válida e o seu schema foi preservado.
+- **Testes:** 62 testes automatizados aprovados em Java 8 e Java 21. Sessões geradas: 1.104
+  eventos com os 23 tipos, válidos pelo JSON Schema e sem ocorrências nas 21 regras. Jogo real
+  executado por programa (4 sessões, 3 participantes, 1.345 eventos): armadilhas, prazos
+  esgotados, recompensas de 1 a 7, liberação de personagem, pausas por tecla, menu e perda de foco
+  e os quatro tipos de encerramento (inclusive o processo encerrado à força), sem nenhum erro nas
+  21 regras; o único aviso foi o esperado para a sessão encerrada à força.
+- **Teste no Windows** (Eclipse, Java 8 de 32 bits): 62 testes aprovados, inclusive o encerramento
+  forçado de um processo; duas sessões de um participante novo com respostas erradas, prazo
+  esgotado, pausas por perda de foco, pausa pela tecla F8 retomada pela recuperação do foco,
+  armadilhas, recompensa e saída pelo menu, sem nenhum erro nem aviso nas 21 regras. O
+  encerramento pelo Gerenciador de Tarefas foi tratado pelo jogo como fechamento da janela
+  (`window_closed`), porque o Windows primeiro pede que a janela se feche
+  (`validacao-registros.md`, seção 9).
+
+### 8.3 Decisões
+
+As nove decisões desta etapa (D41 a D49) estão na seção 12 de `validacao-registros.md`, com a
+justificativa. Podem ser revistas pelo orientador.
+
+---
+
+## 9. Andamento das etapas
 
 | Etapa | Descrição | Situação |
 |---|---|---|
@@ -336,8 +393,8 @@ justificativa. Podem ser revistas pelo orientador.
 | 4 | Estratégia de persistência | Concluída |
 | 5 | Desenvolvimento do componente de registro | Concluída |
 | 6 | Exportação e disponibilização dos dados | Concluída |
-| 7 | Testes, validação e integridade dos registros | Próxima |
-| 8 | Documentação e consolidação | Pendente |
+| 7 | Testes, validação e integridade dos registros | Concluída |
+| 8 | Documentação e consolidação | Próxima |
 
 As Etapas 1 e 2 foram incorporadas a este repositório pelo Pull Request #1 (01/10/2026). A partir
 da Etapa 3, cada etapa é apresentada em um Pull Request próprio.
@@ -348,5 +405,6 @@ da Etapa 3, cada etapa é apresentada em um Pull Request próprio.
 
 Este trabalho é feito por Sávio, com apoio de uma ferramenta de inteligência artificial
 (Claude, da Anthropic) na análise do código, na preparação das correções, na implementação do
-componente de registro e do exportador, nos testes automatizados e na redação da documentação.
+componente de registro, do exportador e da verificação de integridade, nos testes automatizados e
+na redação da documentação.
 As alterações são acompanhadas, revisadas e testadas por ele.

@@ -55,6 +55,7 @@ O Projeto Evolução ADS fornece infraestrutura que pode ser utilizada pelo TCC 
 - [Estratégia de persistência dos eventos](persistencia-eventos.md)
 - [Componente de registro dos eventos de interação](componente-registro.md)
 - [Exportação dos dados de interação](exportacao-dados.md)
+- [Validação técnica dos registros de interação](validacao-registros.md)
 
 ## Princípios de evolução
 
