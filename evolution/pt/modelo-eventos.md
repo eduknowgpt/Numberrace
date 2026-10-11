@@ -1,4 +1,4 @@
-# Modelo de eventos de interação do Number Race (versão 1.0)
+# Modelo de eventos de interação do Number Race (versão 1.1)
 
 Produto da **Etapa 3 (modelagem dos eventos de interação)** do projeto "Modelagem, registro e
 persistência de dados de interação no Number Race". Faz parte do
@@ -10,11 +10,17 @@ campos obrigatórios e opcionais, identificadores, relação entre sessão e eve
 consistência e forma de evolução do modelo. Onde e como os eventos serão armazenados é tema da
 Etapa 4; a implementação no jogo, da Etapa 5.
 
+**Versão 1.1 (Etapa 7).** A versão 1.1 acrescenta um único valor ao campo `trigger` de `PAUSE` e
+`RESUME`: `window_focus`, para a pausa automática que o jogo faz quando a sua janela perde o foco
+(seção 7.1). Nada foi removido nem renomeado; todo evento válido na versão 1.0 continua válido.
+O histórico está na seção 11.1.
+
 Arquivos que acompanham este documento:
 
 | Arquivo | Conteúdo |
 |---|---|
-| [`modelo-eventos.schema.json`](modelo-eventos.schema.json) | O modelo em formato verificável por programa (JSON Schema, versão 2020-12) |
+| [`modelo-eventos.schema.json`](modelo-eventos.schema.json) | O modelo em formato verificável por programa (JSON Schema, versão 2020-12). Versão 1.1; valida eventos das versões 1.0 e 1.1, cada um conforme a sua versão |
+| [`modelo-eventos-1.0.schema.json`](modelo-eventos-1.0.schema.json) | O schema da versão 1.0, preservado sem alteração (seção 11) |
 | [`modelo-eventos-exemplos.json`](modelo-eventos-exemplos.json) | Uma sessão simulada com 44 eventos (três rodadas), validada contra o schema |
 
 As referências de código (arquivo e linha) correspondem ao ramo `main` deste repositório após a
@@ -232,10 +238,17 @@ preliminares; o modelo tem 23 tipos (ver a correspondência na seção 7.5).
 `opponent_character` (índice 0–3, sorteado pelo jogo; C).
 
 **`PAUSE`** e **`RESUME`** (E06 e E07): `trigger` (`pause_key` para a tecla F8, `menu` para a
-tecla Esc; O) e `screen` (C). Abrir o menu também pausa o jogo (`GameObject.changeState`,
+tecla Esc, `window_focus` quando a janela do jogo perde ou recupera o foco, a partir da versão
+1.1; O) e `screen` (C). Abrir o menu também pausa o jogo (`GameObject.changeState`,
 l. 334); por isso a abertura do menu é registrada como `PAUSE` com `trigger = menu`
 (decisão D11). Depois dela vem `RESUME` (volta ao jogo) ou `SESSION_END` (troca de aluno ou
-saída).
+saída). O jogo também pausa sozinho quando a sua janela perde o foco (por exemplo, quando outro
+programa é aberto por cima) e retoma quando ela volta a ter o foco (`GameObject`,
+`windowDeactivated` e `windowActivated`). Na versão 1.0 essa pausa não era registrada, e o tempo
+parado aparecia nos dados como um intervalo sem explicação; a partir da versão 1.1 ela é
+registrada com `trigger = window_focus`. Se o jogo já estava pausado pela tecla F8 quando a janela
+perdeu o foco, o jogo retoma ao recuperar o foco, e o registro mostra `PAUSE` (`pause_key`)
+seguido de `RESUME` (`window_focus`).
 
 ### 7.2 Partida
 
@@ -424,7 +437,9 @@ O JSON Schema confere, em cada evento:
   quando é falso;
 - a ausência de campos não previstos, o que revela nomes digitados errado.
 
-Regras que envolvem vários eventos e por isso são conferidas por teste, e não pelo schema:
+Regras que envolvem vários eventos e por isso são conferidas por programa, e não pelo schema
+(desde a Etapa 7, o exportador confere 21 regras desse tipo em toda exportação; ver
+[validação dos registros](validacao-registros.md)):
 
 1. `sequence_number` vai de 1 até o número de eventos da sessão, sem repetição nem lacuna;
 2. os `timestamp` de uma sessão não diminuem;
@@ -467,6 +482,13 @@ armadilha, o número menor, atribuído à criança, era a opção mais vantajosa
   previstas: novos valores de `activity` (outras atividades do jogo); registro clique a clique
   no tabuleiro (decisão D2); novos tipos de evento, se o jogo ganhar funcionalidades (por
   exemplo, ajuda à criança, hoje inexistente).
+
+### 11.1 Histórico de versões
+
+| Versão | Data | Mudança | Motivo |
+|---|---|---|---|
+| 1.0 | 02/10/2026 | Versão inicial (Etapa 3) | — |
+| 1.1 | 11/10/2026 | Novo valor `window_focus` em `PAUSE.trigger` e `RESUME.trigger` | A pausa automática por perda de foco da janela não era registrada (observação 16 do [componente de registro](componente-registro.md)); a Etapa 7 a classificou como inconsistência temporal (intervalo sem eventos e sem explicação) |
 
 ## 12. Portabilidade
 

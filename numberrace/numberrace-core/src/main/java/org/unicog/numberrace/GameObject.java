@@ -836,6 +836,7 @@ public class GameObject extends NumCompListener {
 
         window.setUndecorated(fullscreen);
         window.setResizable(false); // prevent any user resizing
+        GameEvents.displayMode(fullscreen);
 
         if (fullscreen) {
             display = new FullScreenDisplay();
@@ -860,6 +861,7 @@ public class GameObject extends NumCompListener {
             public void windowActivated(WindowEvent e) {
                 if (reactOnActivation && currentState != GameStates.MENU) {
                     unpause();
+                    GameEvents.resumed("window_focus", currentState);
                 }
             }
 
@@ -870,6 +872,7 @@ public class GameObject extends NumCompListener {
 
             public void windowDeactivated(WindowEvent e) {
                 if (reactOnActivation && currentState != GameStates.MENU) {
+                    GameEvents.paused("window_focus", currentState);
                     pause();
                 }
             }

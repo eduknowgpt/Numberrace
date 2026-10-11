@@ -1,0 +1,1307 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Evento de interação do Number Race",
+  "description": "Modelo de eventos de interação, versão 1.0. Cada evento tem uma parte comum (campos do primeiro nível) e uma parte específica do tipo (campo data). Especificação completa em modelo-eventos.md.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "event_id",
+    "event_type",
+    "timestamp",
+    "session_id",
+    "participant_id",
+    "sequence_number",
+    "data"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "description": "Versão do modelo usada para escrever o evento.",
+      "type": "string",
+      "const": "1.0"
+    },
+    "event_id": {
+      "description": "Identificador único do evento (UUID versão 4).",
+      "$ref": "#/$defs/uuid"
+    },
+    "event_type": {
+      "description": "Tipo do evento.",
+      "type": "string",
+      "enum": [
+        "SESSION_START",
+        "SESSION_END",
+        "SCREEN_CHANGED",
+        "THEME_SELECTED",
+        "CHARACTER_SELECTED",
+        "PAUSE",
+        "RESUME",
+        "GAME_START",
+        "GAME_END",
+        "DIFFICULTY_ADJUSTED",
+        "TURN_START",
+        "STIMULUS_PRESENTED",
+        "RESPONSE_ENABLED",
+        "CLICK_IGNORED",
+        "ANSWER",
+        "ANSWER_TIMEOUT",
+        "TURN_RESULT",
+        "MOVE",
+        "COLLISION",
+        "HAZARD",
+        "FEEDBACK_PRESENTED",
+        "REWARD_SAVED",
+        "CHARACTER_UNLOCKED"
+      ]
+    },
+    "timestamp": {
+      "description": "Instante do evento no formato ISO 8601, com milissegundos e fuso horário.",
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}(Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "session_id": {
+      "description": "Identificador único da sessão (UUID versão 4).",
+      "$ref": "#/$defs/uuid"
+    },
+    "participant_id": {
+      "description": "Código pseudonimizado do participante. Não pode conter nome nem outro dado de identificação pessoal direta.",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,32}$"
+    },
+    "sequence_number": {
+      "description": "Ordem do evento dentro da sessão, começando em 1, sem repetição e sem lacunas.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "activity": {
+      "description": "Atividade em curso. Presente nos eventos que ocorrem dentro de uma partida.",
+      "type": "string",
+      "enum": [
+        "number_comparison"
+      ]
+    },
+    "game_number": {
+      "description": "Número da partida dentro da sessão, começando em 1.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "turn_number": {
+      "description": "Número da rodada dentro da partida, começando em 1.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "data": {
+      "description": "Parte específica do tipo de evento.",
+      "type": "object"
+    }
+  },
+  "dependentRequired": {
+    "turn_number": [
+      "game_number"
+    ],
+    "game_number": [
+      "activity"
+    ]
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "enum": [
+              "GAME_START",
+              "GAME_END",
+              "DIFFICULTY_ADJUSTED"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "activity",
+          "game_number"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "enum": [
+              "TURN_START",
+              "STIMULUS_PRESENTED",
+              "RESPONSE_ENABLED",
+              "CLICK_IGNORED",
+              "ANSWER",
+              "ANSWER_TIMEOUT",
+              "TURN_RESULT",
+              "MOVE",
+              "COLLISION",
+              "HAZARD",
+              "FEEDBACK_PRESENTED"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "activity",
+          "game_number",
+          "turn_number"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "SESSION_START"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/session_start"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "SESSION_END"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/session_end"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "SCREEN_CHANGED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/screen_changed"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "THEME_SELECTED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/theme_selected"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "CHARACTER_SELECTED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/character_selected"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "PAUSE"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/pause_resume"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "RESUME"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/pause_resume"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "GAME_START"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/game_start"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "GAME_END"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/game_end"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "DIFFICULTY_ADJUSTED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/difficulty_adjusted"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "TURN_START"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/turn_start"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "STIMULUS_PRESENTED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/stimulus_presented"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "RESPONSE_ENABLED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/empty"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "CLICK_IGNORED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/click_ignored"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "ANSWER"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/answer"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "ANSWER_TIMEOUT"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/answer_timeout"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "TURN_RESULT"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/turn_result"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "MOVE"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/move"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "COLLISION"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/collision"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "HAZARD"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/hazard"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "FEEDBACK_PRESENTED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/feedback_presented"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "REWARD_SAVED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/reward_saved"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "CHARACTER_UNLOCKED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/$defs/character_unlocked"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "side": {
+      "description": "Lado da tela.",
+      "type": "string",
+      "enum": [
+        "left",
+        "right"
+      ]
+    },
+    "piece": {
+      "description": "Personagem no tabuleiro: o da criança (player) ou o adversário (opponent).",
+      "type": "string",
+      "enum": [
+        "player",
+        "opponent"
+      ]
+    },
+    "square": {
+      "description": "Casa do tabuleiro. A posição inicial é 0.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "screen": {
+      "description": "Tela do jogo (estado de GameObject.GameStates, em minúsculas).",
+      "type": "string",
+      "enum": [
+        "start",
+        "title",
+        "registration",
+        "theme",
+        "instructions",
+        "characters",
+        "choice",
+        "gameover",
+        "save",
+        "zoo"
+      ]
+    },
+    "theme": {
+      "description": "Mundo escolhido.",
+      "type": "string",
+      "enum": [
+        "jungle",
+        "under_the_sea"
+      ]
+    },
+    "per_piece": {
+      "description": "Um valor para cada personagem.",
+      "type": "object",
+      "required": [
+        "player",
+        "opponent"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "player": {
+          "type": "integer"
+        },
+        "opponent": {
+          "type": "integer"
+        }
+      }
+    },
+    "board_outcome": {
+      "description": "Ganhos e recuos de uma escolha, considerando armadilhas e esbarrões.",
+      "type": "object",
+      "required": [
+        "relative_net_gain",
+        "net_gain",
+        "squares_forward",
+        "squares_back"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "relative_net_gain": {
+          "description": "Ganho líquido da criança menos o do adversário.",
+          "type": "integer"
+        },
+        "net_gain": {
+          "$ref": "#/$defs/per_piece"
+        },
+        "squares_forward": {
+          "$ref": "#/$defs/per_piece"
+        },
+        "squares_back": {
+          "$ref": "#/$defs/per_piece"
+        }
+      }
+    },
+    "empty": {
+      "type": "object",
+      "additionalProperties": false
+    },
+    "session_start": {
+      "type": "object",
+      "required": [
+        "session_number",
+        "start_level",
+        "start_complexity_level",
+        "language",
+        "app_version"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "session_number": {
+          "description": "Ordem da sessão para este participante (coluna session do registro atual).",
+          "type": "integer",
+          "minimum": 1
+        },
+        "start_level": {
+          "description": "Nível inicial escolhido no cadastro.",
+          "type": "string",
+          "enum": [
+            "easy",
+            "intermediate",
+            "hard"
+          ]
+        },
+        "start_complexity_level": {
+          "description": "Nível de complexidade correspondente em ccl.properties (1, 8 ou 14 na configuração atual).",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 22
+        },
+        "language": {
+          "description": "Idioma do jogo (código ISO 639-1, por exemplo pt).",
+          "type": "string",
+          "pattern": "^[a-z]{2,3}(-[A-Z]{2})?$"
+        },
+        "app_version": {
+          "description": "Versão do jogo.",
+          "type": "string"
+        },
+        "display_mode": {
+          "description": "Modo de exibição.",
+          "type": "string",
+          "enum": [
+            "fullscreen",
+            "in_window"
+          ]
+        }
+      }
+    },
+    "session_end": {
+      "type": "object",
+      "required": [
+        "end_reason",
+        "screen",
+        "game_in_progress"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "end_reason": {
+          "description": "Como a sessão terminou: troca de aluno pelo menu, saída do programa (menu ou Shift+Esc) ou fechamento da janela.",
+          "type": "string",
+          "enum": [
+            "change_student",
+            "quit",
+            "window_closed"
+          ]
+        },
+        "screen": {
+          "$ref": "#/$defs/screen"
+        },
+        "game_in_progress": {
+          "description": "Se havia uma partida em andamento (base do indicador de abandono).",
+          "type": "boolean"
+        }
+      }
+    },
+    "screen_changed": {
+      "type": "object",
+      "required": [
+        "from_screen",
+        "to_screen"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "from_screen": {
+          "$ref": "#/$defs/screen"
+        },
+        "to_screen": {
+          "$ref": "#/$defs/screen"
+        }
+      }
+    },
+    "theme_selected": {
+      "type": "object",
+      "required": [
+        "theme"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "theme": {
+          "$ref": "#/$defs/theme"
+        }
+      }
+    },
+    "character_selected": {
+      "type": "object",
+      "required": [
+        "player_character",
+        "opponent_character"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "player_character": {
+          "description": "Índice do personagem escolhido pela criança (0 a 5).",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "opponent_character": {
+          "description": "Índice do adversário, sorteado pelo jogo (0 a 3).",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        }
+      }
+    },
+    "pause_resume": {
+      "type": "object",
+      "required": [
+        "trigger",
+        "screen"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "trigger": {
+          "description": "Origem da pausa ou da retomada: tecla F8 ou menu (Esc).",
+          "type": "string",
+          "enum": [
+            "pause_key",
+            "menu"
+          ]
+        },
+        "screen": {
+          "$ref": "#/$defs/screen"
+        }
+      }
+    },
+    "game_start": {
+      "type": "object",
+      "required": [
+        "board_length",
+        "complexity_level"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "board_length": {
+          "description": "Número de casas do tabuleiro da partida.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "complexity_level": {
+          "description": "Nível de complexidade da primeira rodada, que define o tabuleiro.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 22
+        }
+      }
+    },
+    "game_end": {
+      "type": "object",
+      "required": [
+        "winner",
+        "turns_played",
+        "final_squares"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "winner": {
+          "$ref": "#/$defs/piece"
+        },
+        "turns_played": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "final_squares": {
+          "$ref": "#/$defs/per_piece"
+        }
+      }
+    },
+    "difficulty_adjusted": {
+      "type": "object",
+      "required": [
+        "next_turn_number",
+        "difficulty",
+        "mean_success",
+        "desired_difficulty",
+        "estimated_difficulty",
+        "coords_chosen"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "next_turn_number": {
+          "description": "Rodada para a qual a dificuldade foi escolhida.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "difficulty": {
+          "description": "Dificuldade escolhida em cada dimensão, de 0 a 1.",
+          "type": "object",
+          "required": [
+            "speed",
+            "distance",
+            "notation"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "speed": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "distance": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "notation": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        },
+        "mean_success": {
+          "description": "Sucesso médio estimado pelo algoritmo (meanSucc).",
+          "type": "number"
+        },
+        "desired_difficulty": {
+          "description": "Dificuldade desejada (currDesir).",
+          "type": "number"
+        },
+        "estimated_difficulty": {
+          "description": "Dificuldade estimada do ponto escolhido (edChosen).",
+          "type": "number"
+        },
+        "coords_chosen": {
+          "description": "Coordenadas escolhidas no espaço de problemas (ptChosn1 a ptChosn3).",
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        }
+      }
+    },
+    "turn_start": {
+      "type": "object",
+      "required": [
+        "complexity_level",
+        "representation",
+        "max_value",
+        "addition",
+        "subtraction",
+        "hazards_enabled",
+        "hazards_on_board",
+        "deadline_trial",
+        "deadline_ms",
+        "control_for",
+        "squares"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "complexity_level": {
+          "description": "Nível de complexidade da rodada (1 a 22, ccl.properties).",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 22
+        },
+        "representation": {
+          "description": "Formas de apresentação dos números nesta rodada.",
+          "type": "object",
+          "required": [
+            "dots",
+            "spoken",
+            "digits",
+            "dot_fading",
+            "dot_fading_ms"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "dots": {
+              "description": "Quantidade em pontos (representação não simbólica).",
+              "type": "boolean"
+            },
+            "spoken": {
+              "description": "Número falado.",
+              "type": "boolean"
+            },
+            "digits": {
+              "description": "Número em algarismos.",
+              "type": "boolean"
+            },
+            "dot_fading": {
+              "description": "Os pontos se apagam.",
+              "type": "boolean"
+            },
+            "dot_fading_ms": {
+              "description": "Duração do apagamento (0 quando não há).",
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "max_value": {
+          "description": "Maior valor possível nesta rodada (teto do intervalo).",
+          "type": "integer",
+          "minimum": 1
+        },
+        "addition": {
+          "description": "Há soma num dos lados.",
+          "type": "boolean"
+        },
+        "subtraction": {
+          "description": "Há subtração num dos lados.",
+          "type": "boolean"
+        },
+        "hazards_enabled": {
+          "description": "O nível da rodada prevê armadilhas (o jogo pode acrescentar novas armadilhas ao tabuleiro). Armadilhas já colocadas permanecem mesmo quando é falso.",
+          "type": "boolean"
+        },
+        "hazards_on_board": {
+          "description": "Armadilhas presentes no tabuleiro no início da rodada, inclusive as colocadas em rodadas anteriores (lista vazia quando não há).",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "square",
+              "penalty"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "square": {
+                "$ref": "#/$defs/square"
+              },
+              "penalty": {
+                "description": "Casas de recuo (1 a 3).",
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 3
+              }
+            }
+          }
+        },
+        "deadline_trial": {
+          "description": "A rodada tem prazo para responder.",
+          "type": "boolean"
+        },
+        "deadline_ms": {
+          "description": "Prazo em milissegundos; null quando a rodada não tem prazo.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "control_for": {
+          "description": "Controle das nuvens de pontos: densidade fixa ou tamanho fixo dos pontos.",
+          "type": "string",
+          "enum": [
+            "density",
+            "item_size"
+          ]
+        },
+        "squares": {
+          "description": "Posição dos personagens no início da rodada.",
+          "$ref": "#/$defs/per_piece"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "deadline_trial": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "deadline_ms": {
+                "type": "integer"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "deadline_ms": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "stimulus_presented": {
+      "type": "object",
+      "required": [
+        "side",
+        "value",
+        "operation"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "side": {
+          "$ref": "#/$defs/side"
+        },
+        "value": {
+          "description": "Quantidade a comparar (resultado da operação, quando houver).",
+          "type": "integer",
+          "minimum": 0
+        },
+        "operation": {
+          "description": "Operação mostrada neste lado; null quando não há.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "required": [
+                "operator",
+                "operands"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "operator": {
+                  "type": "string",
+                  "enum": [
+                    "+",
+                    "-"
+                  ]
+                },
+                "operands": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "click_ignored": {
+      "type": "object",
+      "required": [
+        "side"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "side": {
+          "$ref": "#/$defs/side"
+        }
+      }
+    },
+    "answer": {
+      "type": "object",
+      "required": [
+        "side",
+        "response_time_ms",
+        "response_time_from_first_stimulus_ms",
+        "correct_larger",
+        "correct_final"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "side": {
+          "description": "Lado escolhido pela criança.",
+          "$ref": "#/$defs/side"
+        },
+        "response_time_ms": {
+          "description": "Tempo desde a liberação da resposta (RESPONSE_ENABLED) até o clique.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "response_time_from_first_stimulus_ms": {
+          "description": "Tempo desde o estímulo esquerdo até o clique; equivale à coluna RT do registro atual.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "correct_larger": {
+          "description": "Derivado: escolheu o número maior (respCorr).",
+          "type": "boolean"
+        },
+        "correct_final": {
+          "description": "Derivado: escolha mais vantajosa considerando armadilhas e esbarrões (finalCorr); é o resultado enviado ao algoritmo.",
+          "type": "boolean"
+        }
+      }
+    },
+    "answer_timeout": {
+      "type": "object",
+      "required": [
+        "deadline_ms",
+        "assigned_side"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "deadline_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "assigned_side": {
+          "description": "Lado que sobrou para a criança (o menor), atribuído pelo jogo.",
+          "$ref": "#/$defs/side"
+        }
+      }
+    },
+    "turn_result": {
+      "type": "object",
+      "required": [
+        "turn_winner",
+        "outcome",
+        "hypothetical_outcome"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "turn_winner": {
+          "description": "Derivado: quem levou vantagem na rodada (actualWinner).",
+          "$ref": "#/$defs/piece"
+        },
+        "outcome": {
+          "description": "Derivado: resultado da escolha feita.",
+          "$ref": "#/$defs/board_outcome"
+        },
+        "hypothetical_outcome": {
+          "description": "Derivado: resultado se a escolha tivesse sido o outro lado.",
+          "$ref": "#/$defs/board_outcome"
+        }
+      }
+    },
+    "move": {
+      "type": "object",
+      "required": [
+        "piece",
+        "from_square",
+        "to_square",
+        "steps",
+        "too_far_attempts"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "piece": {
+          "$ref": "#/$defs/piece"
+        },
+        "from_square": {
+          "$ref": "#/$defs/square"
+        },
+        "to_square": {
+          "$ref": "#/$defs/square"
+        },
+        "steps": {
+          "description": "Número de casas que deviam ser percorridas.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "too_far_attempts": {
+          "description": "Cliques em casas além do permitido durante este movimento.",
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "collision": {
+      "type": "object",
+      "required": [
+        "pushed_piece",
+        "from_square",
+        "to_square"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "pushed_piece": {
+          "description": "Personagem que foi empurrado para trás.",
+          "$ref": "#/$defs/piece"
+        },
+        "from_square": {
+          "$ref": "#/$defs/square"
+        },
+        "to_square": {
+          "$ref": "#/$defs/square"
+        }
+      }
+    },
+    "hazard": {
+      "type": "object",
+      "required": [
+        "piece",
+        "square",
+        "penalty",
+        "to_square"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "piece": {
+          "$ref": "#/$defs/piece"
+        },
+        "square": {
+          "description": "Casa da armadilha.",
+          "$ref": "#/$defs/square"
+        },
+        "penalty": {
+          "description": "Casas de recuo (1 a 3).",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "to_square": {
+          "$ref": "#/$defs/square"
+        }
+      }
+    },
+    "feedback_presented": {
+      "type": "object",
+      "required": [
+        "message_key"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "message_key": {
+          "description": "Identificador da fala apresentada (nome do áudio, por exemplo enemy1_youreCatchingUp).",
+          "type": "string"
+        },
+        "sound_key": {
+          "description": "Som de acerto ou erro que acompanha a fala, quando houver.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "reward_saved": {
+      "type": "object",
+      "required": [
+        "reward_type",
+        "theme"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "reward_type": {
+          "description": "Tipo do animal salvo (1 a 7).",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 7
+        },
+        "theme": {
+          "$ref": "#/$defs/theme"
+        }
+      }
+    },
+    "character_unlocked": {
+      "type": "object",
+      "required": [
+        "character",
+        "theme"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "character": {
+          "description": "Índice do personagem liberado (0 a 5).",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "theme": {
+          "$ref": "#/$defs/theme"
+        }
+      }
+    }
+  }
+}

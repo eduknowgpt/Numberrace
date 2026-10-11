@@ -1,7 +1,7 @@
 package org.unicog.numberrace.analytics;
 
 /**
- * Tipos de evento do modelo de eventos de interação 1.0 (evolution/pt/modelo-eventos.md).
+ * Tipos de evento do modelo de eventos de interação 1.1 (evolution/pt/modelo-eventos.md).
  * O escopo indica quais campos de contexto a parte comum do evento deve ter.
  */
 public enum EventType {
