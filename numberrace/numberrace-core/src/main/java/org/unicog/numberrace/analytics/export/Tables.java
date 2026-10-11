@@ -89,6 +89,25 @@ final class Tables {
     }
 
     static Table sessions(List<SessionData> sessions) {
+        return sessions(sessions, null);
+    }
+
+    /**
+     * Tabela de sessões. {@code findings}: resultado da verificação de integridade, para as colunas
+     * {@code integrity_errors} e {@code integrity_warnings} (nulo: colunas vazias).
+     */
+    static Table sessions(List<SessionData> sessions, List<IntegrityChecker.Finding> findings) {
+        Map<String, int[]> integrity = new HashMap<String, int[]>();
+        if (findings != null) {
+            for (IntegrityChecker.Finding f : findings) {
+                int[] c = integrity.get(f.sessionId);
+                if (c == null) {
+                    c = new int[2];
+                    integrity.put(f.sessionId, c);
+                }
+                c[f.rule.severity == IntegrityChecker.Severity.ERROR ? 0 : 1]++;
+            }
+        }
         Table t = new Table("sessions", "Uma sessão por linha: dados de SESSION_START e SESSION_END e contagens "
                 + "de eventos da sessão.");
         t.column("participant_id", Type.TEXT, "", "Código pseudonimizado do participante", ENVELOPE)
@@ -111,12 +130,16 @@ final class Tables {
                 .column("timeouts", Type.INTEGER, "", "Rodadas com prazo esgotado", "contagem de ANSWER_TIMEOUT")
                 .column("correct_larger_answers", Type.INTEGER, "", "Respostas em que a criança escolheu o maior número", "ANSWER.correct_larger = true")
                 .column("clicks_ignored", Type.INTEGER, "", "Cliques antes da liberação da resposta", "contagem de CLICK_IGNORED")
-                .column("pauses", Type.INTEGER, "", "Pausas (tecla F8 ou menu)", "contagem de PAUSE")
+                .column("pauses", Type.INTEGER, "", "Pausas (tecla F8, menu ou, a partir do modelo 1.1, perda de foco da janela)", "contagem de PAUSE")
                 .column("rewards_saved", Type.INTEGER, "", "Recompensas guardadas", "contagem de REWARD_SAVED")
                 .column("characters_unlocked", Type.INTEGER, "", "Personagens desbloqueados", "contagem de CHARACTER_UNLOCKED")
                 .column("events", Type.INTEGER, "", "Eventos exportados da sessão", "contagem")
                 .column("missing_events", Type.INTEGER, "", "Números de sequência ausentes (eventos perdidos)", "lacunas em sequence_number")
-                .column("complete", Type.BOOLEAN, "", "Sessão com SESSION_START, SESSION_END e sem lacunas", "derivado");
+                .column("complete", Type.BOOLEAN, "", "Sessão com SESSION_START, SESSION_END e sem lacunas", "derivado")
+                .column("integrity_errors", Type.INTEGER, "", "Erros encontrados na verificação de integridade "
+                        + "(detalhes em integrity.csv e relatorio-integridade.txt)", "verificação de integridade")
+                .column("integrity_warnings", Type.INTEGER, "", "Avisos da verificação de integridade",
+                        "verificação de integridade");
         for (SessionData s : sessions) {
             Map<String, Object> r = t.newRow();
             r.put("participant_id", s.getParticipantId());
@@ -165,6 +188,41 @@ final class Tables {
             r.put("missing_events", Integer.valueOf(s.getMissingSequenceNumbers().size()));
             r.put("complete", Boolean.valueOf(s.hasSessionStart() && s.hasSessionEnd()
                     && s.getMissingSequenceNumbers().isEmpty()));
+            if (findings != null) {
+                int[] c = integrity.get(s.getSessionId());
+                r.put("integrity_errors", Integer.valueOf(c == null ? 0 : c[0]));
+                r.put("integrity_warnings", Integer.valueOf(c == null ? 0 : c[1]));
+            }
+        }
+        return t;
+    }
+
+    /** Uma linha por problema encontrado na verificação de integridade. */
+    static Table integrity(List<IntegrityChecker.Finding> findings) {
+        Table t = new Table("integrity", "Verificação de integridade: um problema por linha (regras em "
+                + "relatorio-integridade.txt). Sem linhas, nenhum problema foi encontrado.");
+        t.column("participant_id", Type.TEXT, "", "Código pseudonimizado do participante", ENVELOPE)
+                .column("session_id", Type.TEXT, "", "Identificador da sessão (UUID)", ENVELOPE)
+                .column("rule", Type.TEXT, "", "Regra verificada (R01 a R21)", "verificação de integridade")
+                .column("severity", Type.TEXT, "", "error (dados incoerentes) ou warning (merece atenção, pode ter "
+                        + "explicação legítima)", "verificação de integridade")
+                .column("sequence_number", Type.INTEGER, "", "Evento em que o problema foi encontrado (vazio se for "
+                        + "da sessão inteira)", ENVELOPE)
+                .column("game_number", Type.INTEGER, "", "Partida do problema, quando houver", ENVELOPE)
+                .column("turn_number", Type.INTEGER, "", "Rodada do problema, quando houver", ENVELOPE)
+                .column("rule_description", Type.TEXT, "", "O que a regra exige", "verificação de integridade")
+                .column("message", Type.TEXT, "", "O que foi encontrado", "verificação de integridade");
+        for (IntegrityChecker.Finding f : findings) {
+            Map<String, Object> r = t.newRow();
+            r.put("participant_id", f.participantId);
+            r.put("session_id", f.sessionId);
+            r.put("rule", f.rule.id);
+            r.put("severity", f.rule.severity == IntegrityChecker.Severity.ERROR ? "error" : "warning");
+            r.put("sequence_number", f.sequenceNumber);
+            r.put("game_number", f.gameNumber);
+            r.put("turn_number", f.turnNumber);
+            r.put("rule_description", f.rule.description);
+            r.put("message", f.message);
         }
         return t;
     }

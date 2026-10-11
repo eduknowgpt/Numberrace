@@ -36,10 +36,10 @@ import org.unicog.numberrace.analytics.SqliteSchema;
  *
  * <pre>
  * exportacao_AAAA-MM-DD_HHMMSS/
- *   LEIA-ME.txt, manifest.json, relatorio-importacao.txt
+ *   LEIA-ME.txt, manifest.json, relatorio-importacao.txt, relatorio-integridade.txt
  *   events.jsonl      eventos exportados, sem alteração (dado bruto)
- *   interaction.db    SQLite: tabela event (como no jogo) e tabelas session e turn
- *   csv/              events, sessions, turns e dicionario-dados (vírgula, ponto decimal)
+ *   interaction.db    SQLite: tabela event (como no jogo) e tabelas session, turn e integrity
+ *   csv/              events, sessions, turns, integrity e dicionario-dados (vírgula, ponto decimal)
  *   excel/            os mesmos arquivos para o Excel em português (ponto e vírgula, vírgula decimal)
  * </pre>
  *
@@ -52,6 +52,7 @@ final class PackageWriter {
     static final String EVENTS_JSONL = "events.jsonl";
     static final String DATABASE = "interaction.db";
     static final String DICTIONARY = "dicionario-dados";
+    static final String INTEGRITY_REPORT = "relatorio-integridade.txt";
 
     private static final Charset UTF8 = Charset.forName("UTF-8");
     private static final int BATCH = 1000;
@@ -70,15 +71,23 @@ final class PackageWriter {
 
     Result write(File outputRoot, List<SessionData> sessions, ImportReport report, ExportFilter filter,
             int sessionsExcluded, boolean zip) throws IOException {
+        return write(outputRoot, sessions, report, IntegrityChecker.check(sessions, new java.util.HashMap<String, Integer>()),
+                filter, sessionsExcluded, zip);
+    }
+
+    Result write(File outputRoot, List<SessionData> sessions, ImportReport report,
+            List<IntegrityChecker.Finding> findings, ExportFilter filter, int sessionsExcluded, boolean zip)
+            throws IOException {
         Result result = new Result();
         OffsetDateTime now = OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS);
         folder = newFolder(outputRoot, "exportacao_" + FOLDER_TIME.format(now));
         result.folder = folder;
 
         Table events = Tables.events(sessions);
-        Table sessionTable = Tables.sessions(sessions);
+        Table sessionTable = Tables.sessions(sessions, findings);
         Table turns = Tables.turns(sessions);
-        Table dictionary = dictionary(events, sessionTable, turns);
+        Table integrity = Tables.integrity(findings);
+        Table dictionary = dictionary(events, sessionTable, turns, integrity);
 
         writeJsonLines(sessions);
         for (CsvWriter.Flavor flavor : CsvWriter.Flavor.values()) {
@@ -86,7 +95,7 @@ final class PackageWriter {
             String how = flavor == CsvWriter.Flavor.EXCEL
                     ? " (Excel em português: ponto e vírgula, vírgula decimal)"
                     : " (vírgula, ponto decimal)";
-            for (Table t : new Table[] { events, sessionTable, turns, dictionary }) {
+            for (Table t : new Table[] { events, sessionTable, turns, integrity, dictionary }) {
                 String path = dir + "/" + t.getName() + ".csv";
                 File f = file(path);
                 f.getParentFile().mkdirs();
@@ -95,9 +104,9 @@ final class PackageWriter {
             }
         }
         try {
-            writeDatabase(sessions, sessionTable, turns, now);
+            writeDatabase(sessions, sessionTable, turns, integrity, now);
             entry(DATABASE, events.getRowCount(), "Banco SQLite: tabela event (como no jogo) e tabelas "
-                    + "session e turn (as mesmas de sessions.csv e turns.csv)");
+                    + "session, turn e integrity (as mesmas de sessions.csv, turns.csv e integrity.csv)");
         } catch (Throwable t) {
             file(DATABASE).delete();
             result.warnings.add("O banco SQLite não foi gerado (" + t + "). Os demais arquivos estão completos.");
@@ -122,6 +131,9 @@ final class PackageWriter {
         writeText("relatorio-importacao.txt", reportText(report, filter, sessionsExcluded, counts, result.warnings));
         entry("relatorio-importacao.txt", -1, "O que a importação encontrou: arquivos lidos, eventos descartados, "
                 + "conflitos e avisos sobre sessões");
+        writeText(INTEGRITY_REPORT, IntegrityChecker.report(sessions.size(), findings));
+        entry(INTEGRITY_REPORT, -1, "Verificação de integridade: as regras conferidas em cada sessão e os "
+                + "problemas encontrados");
         writeText("LEIA-ME.txt", readMe(now, counts, filter));
         entry("LEIA-ME.txt", -1, "Explicação do pacote, em português");
 
@@ -142,6 +154,10 @@ final class PackageWriter {
                 "invalid_events", Integer.valueOf(report.invalidEvents.size()),
                 "conflicts", Integer.valueOf(report.conflicts.size()),
                 "session_warnings", Integer.valueOf(report.sessionWarnings.size())));
+        manifest.put("integrity", Json.obj("rules", Integer.valueOf(IntegrityChecker.RULES.size()),
+                "sessions_checked", Integer.valueOf(sessions.size()),
+                "errors", Integer.valueOf(IntegrityChecker.count(findings, IntegrityChecker.Severity.ERROR)),
+                "warnings", Integer.valueOf(IntegrityChecker.count(findings, IntegrityChecker.Severity.WARNING))));
         manifest.put("files", fileEntries);
         writeText(MANIFEST, Json.write(manifest) + "\n", false);
         result.manifest = manifest;
@@ -195,8 +211,8 @@ final class PackageWriter {
                 + "um por linha (JSON Lines)");
     }
 
-    private void writeDatabase(List<SessionData> sessions, Table sessionTable, Table turns, OffsetDateTime now)
-            throws Exception {
+    private void writeDatabase(List<SessionData> sessions, Table sessionTable, Table turns, Table integrity,
+            OffsetDateTime now) throws Exception {
         Class.forName("org.sqlite.JDBC");
         Connection c = DriverManager.getConnection("jdbc:sqlite:" + file(DATABASE).getAbsolutePath());
         try {
@@ -207,6 +223,7 @@ final class PackageWriter {
             }
             st.execute(createTable("session", sessionTable));
             st.execute(createTable("turn", turns));
+            st.execute(createTable("integrity", integrity));
             st.close();
             PreparedStatement meta = c.prepareStatement("INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)");
             meta.setString(1, "export_created_at");
@@ -242,6 +259,7 @@ final class PackageWriter {
             ins.close();
             insertRows(c, "session", sessionTable);
             insertRows(c, "turn", turns);
+            insertRows(c, "integrity", integrity);
             c.commit();
         } finally {
             c.close();
@@ -362,10 +380,12 @@ final class PackageWriter {
                 + "  turns.csv             Uma linha por rodada: números apresentados, resposta, tempo, resultado.\n"
                 + "  sessions.csv          Uma linha por sessão: início, fim, partidas, rodadas, respostas.\n"
                 + "  events.csv            Um evento por linha: parte comum em colunas e o resto em data_json.\n"
+                + "  integrity.csv         Problemas encontrados na verificação de integridade (um por linha).\n"
                 + "  dicionario-dados.csv  O significado, a unidade e a origem de cada coluna.\n"
                 + "interaction.db          Banco SQLite (abre no DB Browser for SQLite) com as tabelas event,\n"
-                + "                        session e turn.\n"
+                + "                        session, turn e integrity.\n"
                 + "relatorio-importacao.txt  Problemas encontrados nos arquivos de origem.\n"
+                + "relatorio-integridade.txt As regras de integridade conferidas em cada sessão e o resultado.\n"
                 + "manifest.json           Etiqueta do pacote: data, versões, filtros, quantidades e a\n"
                 + "                        impressão digital (SHA-256) de cada arquivo.\n"
                 + "\n"

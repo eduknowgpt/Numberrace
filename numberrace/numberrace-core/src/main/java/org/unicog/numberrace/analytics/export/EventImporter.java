@@ -12,9 +12,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.unicog.numberrace.analytics.EventValidator;
@@ -34,9 +36,19 @@ final class EventImporter {
     private final ImportReport report = new ImportReport();
     private final Map<String, SourceEvent> byEventId = new HashMap<String, SourceEvent>();
     private final Map<String, TreeMap<Integer, SourceEvent>> bySession = new LinkedHashMap<String, TreeMap<Integer, SourceEvent>>();
+    private final Map<String, Set<String>> sessionsByFile = new HashMap<String, Set<String>>();
 
     ImportReport getReport() {
         return report;
+    }
+
+    /** Para cada arquivo lido, quantas sessões diferentes ele contém (o esperado é uma). */
+    Map<String, Integer> getSessionsPerFile() {
+        Map<String, Integer> m = new HashMap<String, Integer>();
+        for (Map.Entry<String, Set<String>> entry : sessionsByFile.entrySet()) {
+            m.put(entry.getKey(), Integer.valueOf(entry.getValue().size()));
+        }
+        return m;
     }
 
     /** Importa os arquivos {@code .jsonl} das entradas (pastas ou arquivos) e devolve as sessões. */
@@ -148,6 +160,12 @@ final class EventImporter {
             return;
         }
         SourceEvent e = new SourceEvent(line, json, file, lineNumber);
+        Set<String> fileSessions = sessionsByFile.get(file);
+        if (fileSessions == null) {
+            fileSessions = new HashSet<String>();
+            sessionsByFile.put(file, fileSessions);
+        }
+        fileSessions.add(e.getSessionId());
         SourceEvent same = byEventId.get(e.getEventId());
         if (same != null) {
             if (same.sameLine(e)) {

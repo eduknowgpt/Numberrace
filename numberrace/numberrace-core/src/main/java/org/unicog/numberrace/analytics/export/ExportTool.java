@@ -107,8 +107,11 @@ public final class ExportTool {
             out.println("Nenhuma sessão para exportar. Confira a pasta de entrada e os filtros.");
             return ERROR;
         }
+        List<IntegrityChecker.Finding> findings = IntegrityChecker.check(selected, importer.getSessionsPerFile());
+        out.println(IntegrityChecker.summary(selected.size(), findings)
+                + (findings.isEmpty() ? "." : " (detalhes em relatorio-integridade.txt)."));
         try {
-            PackageWriter.Result result = new PackageWriter().write(output, selected, report, filter,
+            PackageWriter.Result result = new PackageWriter().write(output, selected, report, findings, filter,
                     all.size() - selected.size(), zip);
             out.println();
             for (String w : result.warnings) {

@@ -44,13 +44,15 @@ public class ExportToolTest {
         File out = tmp.newFolder();
         assertEquals(ExportTool.OK, run("--entrada", in.getPath(), "--saida", out.getPath(), "--zip"));
         File pkg = onlyPackage(out);
-        for (String name : new String[] { "LEIA-ME.txt", "manifest.json", "relatorio-importacao.txt", "events.jsonl",
-                "interaction.db", "csv/events.csv", "csv/sessions.csv", "csv/turns.csv", "csv/dicionario-dados.csv",
-                "excel/events.csv", "excel/sessions.csv", "excel/turns.csv", "excel/dicionario-dados.csv" }) {
+        for (String name : new String[] { "LEIA-ME.txt", "manifest.json", "relatorio-importacao.txt",
+                "relatorio-integridade.txt", "events.jsonl", "interaction.db", "csv/events.csv", "csv/sessions.csv",
+                "csv/turns.csv", "csv/integrity.csv", "csv/dicionario-dados.csv", "excel/events.csv",
+                "excel/sessions.csv", "excel/turns.csv", "excel/integrity.csv", "excel/dicionario-dados.csv" }) {
             assertTrue(name, new File(pkg, name).isFile());
         }
         assertTrue(PackageVerifier.verify(pkg).isEmpty());
         assertTrue(console.toString("UTF-8").contains("Pacote conferido"));
+        assertTrue(console.toString("UTF-8").contains("21 regras; 0 erro(s) e 0 aviso(s)"));
 
         // o bruto exportado é idêntico ao arquivo do jogo
         assertEquals(new String(EventImporter.readAll(new File(in, "events/" + Fixture.PARTICIPANT + "/"
@@ -60,16 +62,19 @@ public class ExportToolTest {
         Connection c = DriverManager.getConnection("jdbc:sqlite:" + new File(pkg, "interaction.db").getPath());
         ResultSet rs = c.createStatement().executeQuery(
                 "SELECT (SELECT COUNT(*) FROM event), (SELECT COUNT(*) FROM session), (SELECT COUNT(*) FROM turn), "
-                        + "(SELECT COUNT(*) FROM turn WHERE response = 'timeout')");
+                        + "(SELECT COUNT(*) FROM turn WHERE response = 'timeout'), (SELECT COUNT(*) FROM integrity), "
+                        + "(SELECT integrity_errors + integrity_warnings FROM session)");
         assertEquals(180, rs.getInt(1));
         assertEquals(1, rs.getInt(2));
         assertEquals(11, rs.getInt(3));
         assertEquals(1, rs.getInt(4));
+        assertEquals(0, rs.getInt(5));
+        assertEquals(0, rs.getInt(6));
         c.close();
 
         ZipFile zip = new ZipFile(new File(out, pkg.getName() + ".zip"));
         assertTrue(zip.getEntry(pkg.getName() + "/excel/turns.csv") != null);
-        assertEquals(13, zip.size());
+        assertEquals(16, zip.size());
         zip.close();
     }
 
