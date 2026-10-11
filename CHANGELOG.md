@@ -16,6 +16,12 @@ are documented here.
   with validation before writing and pseudonymous participant codes
   (`evolution/pt/componente-registro.md`).
 - Unit tests (JUnit 4) for the logging component.
+- Interaction-data exporter (`org.unicog.numberrace.analytics.export.ExportTool`,
+  `numberrace/tools/exportar.bat`): merges the JSON Lines files of one or more
+  computers without duplicates, reports problems, and writes an export package with
+  the raw events, per-event, per-session and per-turn tables in CSV (standard and
+  Brazilian Excel versions), a consolidated SQLite database, a data dictionary and a
+  SHA-256 manifest (`evolution/pt/exportacao-dados.md`).
 
 ### Changed
 - Reorganized the legacy SVN directory structure.
