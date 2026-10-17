@@ -197,15 +197,52 @@ Podem ser revistas pelo orientador.
 
 ---
 
-## 5. Andamento das etapas
+## 5. Etapa 4 — Estratégia de persistência (concluída em 03/10/2026)
+
+**Produto previsto no plano:** especificação da estratégia de persistência dos eventos.
+**Produto:** [`persistencia-eventos.md`](persistencia-eventos.md), acompanhado da estrutura do
+banco SQLite ([`persistencia-eventos.sql`](persistencia-eventos.sql)).
+
+### 5.1 Atividades realizadas
+
+| Atividade do plano | O que foi feito |
+|---|---|
+| Levantamento de alternativas de persistência | Seis alternativas: JSON Lines, arquivo JSON único, CSV, SQLite, banco em servidor ou nuvem e serialização Java |
+| Comparação das alternativas | Prova de conceito em Java 8 com JSON Lines e SQLite (tempo, tamanho, interrupção forçada, falha do driver), estimativa de volume e comparação por critério |
+| Análise de portabilidade e interoperabilidade | Formatos abertos, leitura por outras linguagens e ferramentas, consultas em SQL sobre o JSON |
+| Definição da estratégia de armazenamento | Arquitetura com JSON Lines como registro oficial e SQLite como cópia para consulta |
+| Especificação da estrutura de persistência | Pastas, nomes de arquivos, formato do JSON Lines, tabelas do banco, comportamento em falhas, importação e coleta |
+| Documentação da decisão técnica | `persistencia-eventos.md`, com as decisões D15 a D23 |
+
+### 5.2 Principais resultados
+
+- As duas alternativas finalistas funcionaram em Java 8 e resistiram a interrupções forçadas do
+  processo durante a escrita. O SQLite não abre quando a biblioteca nativa do driver não pode
+  ser extraída.
+- Volume estimado de cerca de 400 eventos por sessão (rodadas de cerca de 50 s num teste do
+  jogo), o que não restringe a escolha.
+- **Decisão:** cada evento é gravado primeiro num arquivo JSON Lines por sessão, que é o registro
+  oficial, e depois copiado para um banco SQLite, usado para consultas. Se o SQLite falhar, a
+  importação completa o banco a partir dos arquivos, sem perda de dados.
+- A identificação dos participantes fica fora da pasta de dados de interação, e o registro atual
+  do jogo é mantido sem alteração.
+
+### 5.3 Decisões
+
+As nove decisões desta etapa (D15 a D23) estão na seção 12 de `persistencia-eventos.md`, com a
+justificativa. Podem ser revistas pelo orientador.
+
+---
+
+## 6. Andamento das etapas
 
 | Etapa | Descrição | Situação |
 |---|---|---|
 | 1 | Ambientação no Number Race e preparação do ambiente | Concluída |
 | 2 | Levantamento dos eventos produzidos pelo jogo (catálogo preliminar) | Concluída |
 | 3 | Modelagem dos eventos de interação | Concluída |
-| 4 | Estratégia de persistência | Próxima |
-| 5 | Desenvolvimento do componente de registro | Pendente |
+| 4 | Estratégia de persistência | Concluída |
+| 5 | Desenvolvimento do componente de registro | Próxima |
 | 6 | Exportação e disponibilização dos dados | Pendente |
 | 7 | Testes, validação e integridade dos registros | Pendente |
 | 8 | Documentação e consolidação | Pendente |
