@@ -1,0 +1,920 @@
+[
+  {
+    "schema_version": "1.0",
+    "event_id": "f3f49249-dc28-4f90-a5ae-c7978306d03b",
+    "event_type": "SESSION_START",
+    "timestamp": "2026-10-01T14:00:00.000-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 1,
+    "data": {
+      "session_number": 2,
+      "start_level": "intermediate",
+      "start_complexity_level": 8,
+      "language": "pt",
+      "app_version": "3.1.0",
+      "display_mode": "in_window"
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "e5121482-3929-4d22-a255-accb1a466884",
+    "event_type": "SCREEN_CHANGED",
+    "timestamp": "2026-10-01T14:00:01.500-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 2,
+    "data": {
+      "from_screen": "registration",
+      "to_screen": "theme"
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "6bad6be2-8e7a-46e9-9f19-950499dd251d",
+    "event_type": "THEME_SELECTED",
+    "timestamp": "2026-10-01T14:00:05.700-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 3,
+    "data": {
+      "theme": "jungle"
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "d7a7a3cc-8c3d-4f16-9293-de8fc88b2875",
+    "event_type": "SCREEN_CHANGED",
+    "timestamp": "2026-10-01T14:00:06.000-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 4,
+    "data": {
+      "from_screen": "theme",
+      "to_screen": "characters"
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "7dabe929-c4a3-44bf-86cd-75e9bb049a79",
+    "event_type": "CHARACTER_SELECTED",
+    "timestamp": "2026-10-01T14:00:11.100-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 5,
+    "data": {
+      "player_character": 2,
+      "opponent_character": 1
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "70eb9a0a-9626-4ae6-85e8-18fac0433cbd",
+    "event_type": "SCREEN_CHANGED",
+    "timestamp": "2026-10-01T14:00:11.300-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 6,
+    "data": {
+      "from_screen": "characters",
+      "to_screen": "choice"
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "14aa4e71-9d3c-4dec-80a6-1f933d6c51e3",
+    "event_type": "GAME_START",
+    "timestamp": "2026-10-01T14:00:11.700-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 7,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "data": {
+      "board_length": 20,
+      "complexity_level": 8
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "1919e93a-d117-45ad-8988-93101c593af5",
+    "event_type": "DIFFICULTY_ADJUSTED",
+    "timestamp": "2026-10-01T14:00:11.700-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 8,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "data": {
+      "next_turn_number": 1,
+      "difficulty": {
+        "speed": 0.12,
+        "distance": 0.35,
+        "notation": 0.33
+      },
+      "mean_success": 0.75,
+      "desired_difficulty": 0.4,
+      "estimated_difficulty": 0.38,
+      "coords_chosen": [
+        1,
+        3,
+        7
+      ]
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "e4163207-d094-4996-82f0-ee99731c9452",
+    "event_type": "TURN_START",
+    "timestamp": "2026-10-01T14:00:13.700-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 9,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 1,
+    "data": {
+      "complexity_level": 8,
+      "representation": {
+        "dots": false,
+        "spoken": false,
+        "digits": true,
+        "dot_fading": false,
+        "dot_fading_ms": 0
+      },
+      "max_value": 5,
+      "addition": true,
+      "subtraction": false,
+      "hazards_enabled": false,
+      "hazards_on_board": [],
+      "deadline_trial": false,
+      "deadline_ms": null,
+      "control_for": "density",
+      "squares": {
+        "player": 0,
+        "opponent": 0
+      }
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "5071950e-adec-4f11-bd83-6e77af67d461",
+    "event_type": "STIMULUS_PRESENTED",
+    "timestamp": "2026-10-01T14:00:14.600-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 10,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 1,
+    "data": {
+      "side": "left",
+      "value": 4,
+      "operation": {
+        "operator": "+",
+        "operands": [
+          1,
+          3
+        ]
+      }
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "59001ac9-4063-49bc-a5b0-0a2d35d14880",
+    "event_type": "STIMULUS_PRESENTED",
+    "timestamp": "2026-10-01T14:00:15.800-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 11,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 1,
+    "data": {
+      "side": "right",
+      "value": 2,
+      "operation": null
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "5b4c8012-ede7-4d0c-bfb8-8309fadb8908",
+    "event_type": "RESPONSE_ENABLED",
+    "timestamp": "2026-10-01T14:00:15.800-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 12,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 1,
+    "data": {}
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "bef7e268-ffe9-46ab-a058-1ccace1d62e0",
+    "event_type": "ANSWER",
+    "timestamp": "2026-10-01T14:00:18.210-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 13,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 1,
+    "data": {
+      "side": "right",
+      "response_time_ms": 2410,
+      "response_time_from_first_stimulus_ms": 3610,
+      "correct_larger": false,
+      "correct_final": false
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "b91dddd9-1389-4372-a341-738c837a7935",
+    "event_type": "TURN_RESULT",
+    "timestamp": "2026-10-01T14:00:18.210-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 14,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 1,
+    "data": {
+      "turn_winner": "opponent",
+      "outcome": {
+        "relative_net_gain": -2,
+        "net_gain": {
+          "player": 2,
+          "opponent": 4
+        },
+        "squares_forward": {
+          "player": 2,
+          "opponent": 4
+        },
+        "squares_back": {
+          "player": 0,
+          "opponent": 0
+        }
+      },
+      "hypothetical_outcome": {
+        "relative_net_gain": 2,
+        "net_gain": {
+          "player": 4,
+          "opponent": 2
+        },
+        "squares_forward": {
+          "player": 4,
+          "opponent": 2
+        },
+        "squares_back": {
+          "player": 0,
+          "opponent": 0
+        }
+      }
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "89be9c1c-8eb5-440f-96f4-488157241955",
+    "event_type": "MOVE",
+    "timestamp": "2026-10-01T14:00:24.710-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 15,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 1,
+    "data": {
+      "piece": "player",
+      "from_square": 0,
+      "to_square": 2,
+      "steps": 2,
+      "too_far_attempts": 0
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "24114258-751b-4c83-89a0-47dc4ac87fc0",
+    "event_type": "MOVE",
+    "timestamp": "2026-10-01T14:00:29.910-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 16,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 1,
+    "data": {
+      "piece": "opponent",
+      "from_square": 0,
+      "to_square": 4,
+      "steps": 4,
+      "too_far_attempts": 1
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "b766ff10-b437-4db5-a511-49bbe060a724",
+    "event_type": "DIFFICULTY_ADJUSTED",
+    "timestamp": "2026-10-01T14:00:30.210-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 17,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 1,
+    "data": {
+      "next_turn_number": 2,
+      "difficulty": {
+        "speed": 0.1,
+        "distance": 0.3,
+        "notation": 0.33
+      },
+      "mean_success": 0.7,
+      "desired_difficulty": 0.36,
+      "estimated_difficulty": 0.35,
+      "coords_chosen": [
+        1,
+        2,
+        7
+      ]
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "d9090b89-0655-4096-8f1a-8a1d93d20470",
+    "event_type": "TURN_START",
+    "timestamp": "2026-10-01T14:00:32.010-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 18,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 2,
+    "data": {
+      "complexity_level": 8,
+      "representation": {
+        "dots": false,
+        "spoken": false,
+        "digits": true,
+        "dot_fading": false,
+        "dot_fading_ms": 0
+      },
+      "max_value": 5,
+      "addition": true,
+      "subtraction": false,
+      "hazards_enabled": false,
+      "hazards_on_board": [],
+      "deadline_trial": false,
+      "deadline_ms": null,
+      "control_for": "item_size",
+      "squares": {
+        "player": 2,
+        "opponent": 4
+      }
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "7608d942-5d11-4a9d-9e6c-9992b5fb12e0",
+    "event_type": "STIMULUS_PRESENTED",
+    "timestamp": "2026-10-01T14:00:32.910-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 19,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 2,
+    "data": {
+      "side": "left",
+      "value": 5,
+      "operation": null
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "e41686cd-6616-4227-9737-14726c167229",
+    "event_type": "CLICK_IGNORED",
+    "timestamp": "2026-10-01T14:00:33.550-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 20,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 2,
+    "data": {
+      "side": "left"
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "de0279e1-7f9a-4098-8df0-5f2595f19a51",
+    "event_type": "STIMULUS_PRESENTED",
+    "timestamp": "2026-10-01T14:00:34.110-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 21,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 2,
+    "data": {
+      "side": "right",
+      "value": 3,
+      "operation": {
+        "operator": "+",
+        "operands": [
+          2,
+          1
+        ]
+      }
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "cd73de00-81a0-4a05-ace9-da661dcf884c",
+    "event_type": "RESPONSE_ENABLED",
+    "timestamp": "2026-10-01T14:00:34.110-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 22,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 2,
+    "data": {}
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "e01c683e-99a4-4df0-9de3-a361c0099eba",
+    "event_type": "ANSWER",
+    "timestamp": "2026-10-01T14:00:35.944-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 23,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 2,
+    "data": {
+      "side": "left",
+      "response_time_ms": 1834,
+      "response_time_from_first_stimulus_ms": 3034,
+      "correct_larger": true,
+      "correct_final": true
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "864fa3f3-eab0-4e9b-a5ed-0de47db4304d",
+    "event_type": "TURN_RESULT",
+    "timestamp": "2026-10-01T14:00:35.944-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 24,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 2,
+    "data": {
+      "turn_winner": "player",
+      "outcome": {
+        "relative_net_gain": 1,
+        "net_gain": {
+          "player": 4,
+          "opponent": 3
+        },
+        "squares_forward": {
+          "player": 5,
+          "opponent": 3
+        },
+        "squares_back": {
+          "player": 1,
+          "opponent": 0
+        }
+      },
+      "hypothetical_outcome": {
+        "relative_net_gain": -2,
+        "net_gain": {
+          "player": 3,
+          "opponent": 5
+        },
+        "squares_forward": {
+          "player": 3,
+          "opponent": 5
+        },
+        "squares_back": {
+          "player": 0,
+          "opponent": 0
+        }
+      }
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "90624fe3-6b82-46c9-982f-b0f1423674a6",
+    "event_type": "MOVE",
+    "timestamp": "2026-10-01T14:00:43.044-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 25,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 2,
+    "data": {
+      "piece": "player",
+      "from_square": 2,
+      "to_square": 7,
+      "steps": 5,
+      "too_far_attempts": 0
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "8350a73f-7aac-419f-bb75-9e0fed1d9d16",
+    "event_type": "MOVE",
+    "timestamp": "2026-10-01T14:00:47.344-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 26,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 2,
+    "data": {
+      "piece": "opponent",
+      "from_square": 4,
+      "to_square": 7,
+      "steps": 3,
+      "too_far_attempts": 0
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "93550840-067f-4cfc-8e1f-d3d9849acfb5",
+    "event_type": "COLLISION",
+    "timestamp": "2026-10-01T14:00:48.244-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 27,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 2,
+    "data": {
+      "pushed_piece": "player",
+      "from_square": 7,
+      "to_square": 6
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "d1711cbd-2106-419e-840d-31b5397a7623",
+    "event_type": "FEEDBACK_PRESENTED",
+    "timestamp": "2026-10-01T14:00:50.344-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 28,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 2,
+    "data": {
+      "message_key": "enemy1_youreCatchingUp",
+      "sound_key": "right"
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "85f184e0-b464-4554-b675-299b0c83e786",
+    "event_type": "DIFFICULTY_ADJUSTED",
+    "timestamp": "2026-10-01T14:00:53.344-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 29,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 2,
+    "data": {
+      "next_turn_number": 3,
+      "difficulty": {
+        "speed": 0.62,
+        "distance": 0.4,
+        "notation": 0.3
+      },
+      "mean_success": 0.72,
+      "desired_difficulty": 0.42,
+      "estimated_difficulty": 0.41,
+      "coords_chosen": [
+        5,
+        3,
+        6
+      ]
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "b7a1774f-1a42-421e-aba4-c70ee306f0c4",
+    "event_type": "TURN_START",
+    "timestamp": "2026-10-01T14:00:55.144-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 30,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 3,
+    "data": {
+      "complexity_level": 7,
+      "representation": {
+        "dots": false,
+        "spoken": false,
+        "digits": true,
+        "dot_fading": false,
+        "dot_fading_ms": 0
+      },
+      "max_value": 5,
+      "addition": false,
+      "subtraction": false,
+      "hazards_enabled": true,
+      "hazards_on_board": [
+        {
+          "square": 8,
+          "penalty": 2
+        },
+        {
+          "square": 13,
+          "penalty": 1
+        }
+      ],
+      "deadline_trial": true,
+      "deadline_ms": 4000,
+      "control_for": "density",
+      "squares": {
+        "player": 6,
+        "opponent": 7
+      }
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "2475263c-7854-4014-aded-c86a9f4fb02b",
+    "event_type": "STIMULUS_PRESENTED",
+    "timestamp": "2026-10-01T14:00:56.044-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 31,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 3,
+    "data": {
+      "side": "left",
+      "value": 2,
+      "operation": null
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "d9814559-3a9a-4a39-a261-e34a7b6bc3c6",
+    "event_type": "STIMULUS_PRESENTED",
+    "timestamp": "2026-10-01T14:00:57.244-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 32,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 3,
+    "data": {
+      "side": "right",
+      "value": 4,
+      "operation": null
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "b3618e1c-a06d-4a69-9f3c-42b2e2cbbb93",
+    "event_type": "RESPONSE_ENABLED",
+    "timestamp": "2026-10-01T14:00:57.244-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 33,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 3,
+    "data": {}
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "b6eafff5-782a-4e6b-ac9f-21df74f09af5",
+    "event_type": "ANSWER_TIMEOUT",
+    "timestamp": "2026-10-01T14:01:01.244-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 34,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 3,
+    "data": {
+      "deadline_ms": 4000,
+      "assigned_side": "left"
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "fa97002c-fcba-4167-b5a9-ca5fedf165da",
+    "event_type": "TURN_RESULT",
+    "timestamp": "2026-10-01T14:01:01.244-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 35,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 3,
+    "data": {
+      "turn_winner": "opponent",
+      "outcome": {
+        "relative_net_gain": -4,
+        "net_gain": {
+          "player": 0,
+          "opponent": 4
+        },
+        "squares_forward": {
+          "player": 2,
+          "opponent": 4
+        },
+        "squares_back": {
+          "player": 2,
+          "opponent": 0
+        }
+      },
+      "hypothetical_outcome": {
+        "relative_net_gain": 2,
+        "net_gain": {
+          "player": 4,
+          "opponent": 2
+        },
+        "squares_forward": {
+          "player": 4,
+          "opponent": 2
+        },
+        "squares_back": {
+          "player": 0,
+          "opponent": 0
+        }
+      }
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "66eebc57-8f4e-4b4f-8041-f5ee8bae8e66",
+    "event_type": "FEEDBACK_PRESENTED",
+    "timestamp": "2026-10-01T14:01:01.344-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 36,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 3,
+    "data": {
+      "message_key": "enemy1_iTookTheMost",
+      "sound_key": null
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "8c53765f-4ec0-4954-bf8b-2a6aab74fe57",
+    "event_type": "MOVE",
+    "timestamp": "2026-10-01T14:01:08.144-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 37,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 3,
+    "data": {
+      "piece": "player",
+      "from_square": 6,
+      "to_square": 8,
+      "steps": 2,
+      "too_far_attempts": 0
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "b2c55523-807c-4e30-a598-d0dbccbfd2ec",
+    "event_type": "HAZARD",
+    "timestamp": "2026-10-01T14:01:08.844-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 38,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 3,
+    "data": {
+      "piece": "player",
+      "square": 8,
+      "penalty": 2,
+      "to_square": 6
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "66e61127-e26b-424a-8e0d-8d877a98b9ac",
+    "event_type": "MOVE",
+    "timestamp": "2026-10-01T14:01:14.444-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 39,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 3,
+    "data": {
+      "piece": "opponent",
+      "from_square": 7,
+      "to_square": 11,
+      "steps": 4,
+      "too_far_attempts": 0
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "d4f398ee-4b5c-4a95-b3d9-18086edd77d8",
+    "event_type": "DIFFICULTY_ADJUSTED",
+    "timestamp": "2026-10-01T14:01:17.444-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 40,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 3,
+    "data": {
+      "next_turn_number": 4,
+      "difficulty": {
+        "speed": 0.2,
+        "distance": 0.3,
+        "notation": 0.33
+      },
+      "mean_success": 0.68,
+      "desired_difficulty": 0.37,
+      "estimated_difficulty": 0.36,
+      "coords_chosen": [
+        2,
+        2,
+        7
+      ]
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "265c28ea-0879-4955-825f-f87c44df8a13",
+    "event_type": "PAUSE",
+    "timestamp": "2026-10-01T14:01:18.944-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 41,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 3,
+    "data": {
+      "trigger": "pause_key",
+      "screen": "choice"
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "f5ee8c72-98e6-45b7-a1cd-7be8a7d83351",
+    "event_type": "RESUME",
+    "timestamp": "2026-10-01T14:02:03.944-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 42,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 3,
+    "data": {
+      "trigger": "pause_key",
+      "screen": "choice"
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "ed4d19b8-85dc-4a68-8db5-4088754e64f4",
+    "event_type": "PAUSE",
+    "timestamp": "2026-10-01T14:02:06.944-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 43,
+    "activity": "number_comparison",
+    "game_number": 1,
+    "turn_number": 3,
+    "data": {
+      "trigger": "menu",
+      "screen": "choice"
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "event_id": "33288e16-ebe8-4fa9-9c24-c1ae7d510557",
+    "event_type": "SESSION_END",
+    "timestamp": "2026-10-01T14:02:10.944-03:00",
+    "session_id": "f38b2ffc-80a4-4f5a-91c9-bc701e7ea419",
+    "participant_id": "P017",
+    "sequence_number": 44,
+    "data": {
+      "end_reason": "change_student",
+      "screen": "choice",
+      "game_in_progress": true
+    }
+  }
+]
