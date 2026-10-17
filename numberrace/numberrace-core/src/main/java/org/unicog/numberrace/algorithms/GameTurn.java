@@ -253,6 +253,42 @@ public class GameTurn {
         return commaDelimStr;
     }
 
+    public Matrix getCoordsChosen() {
+        return coordsChosen;
+    }
+
+    public int getRelNetGain() {
+        return relNetGain;
+    }
+
+    public int[] getNetGain() {
+        return netGain;
+    }
+
+    public int[] getSquaresMovedForward() {
+        return squaresMovedForward;
+    }
+
+    public int[] getSquaresMovedBack() {
+        return squaresMovedBack;
+    }
+
+    public int getHypRelNetGain() {
+        return h_relNetGain;
+    }
+
+    public int[] getHypNetGain() {
+        return h_netGain;
+    }
+
+    public int[] getHypSquaresMovedForward() {
+        return h_squaresMovedForward;
+    }
+
+    public int[] getHypSquaresMovedBack() {
+        return h_squaresMovedBack;
+    }
+
     public void setCoordsChosen(Matrix coordsChosen) {
         this.coordsChosen = coordsChosen;
     }

@@ -10,6 +10,7 @@ import org.unicog.numberrace.GameObject.GameStates;
 import org.unicog.numberrace.NRRunnableQueue;
 import org.unicog.numberrace.algorithms.AdapDimensions;
 import org.unicog.numberrace.algorithms.GameTurn;
+import org.unicog.numberrace.analytics.GameEvents;
 import org.unicog.numberrace.algorithms.Matrix3D;
 import org.unicog.numberrace.algorithms.NotnDimLevel;
 import org.unicog.numberrace.algorithms.NumCompAlgManager;
@@ -110,6 +111,7 @@ public class NumCompManager implements GameListener {
         ncl.setCurrentTurn(currentTurn);
         currentTurn.startTurn();
         setStimsForTurn();
+        GameEvents.turnStarted(currentTurn, numCompAlgManager.getNotnLevel(currentTurn.getCurrentNotnLevel()));
 
         //        ncl.dotManagers[Constants.PLAYER1]
         //                .switchDrawingScreen("NOWHERE"); //$NON-NLS-1$
@@ -279,6 +281,7 @@ public class NumCompManager implements GameListener {
     }
 
     public void showLeftStims() {
+        GameEvents.stimulusPresented(currentTurn, Constants.LEFT);
         if (numCompAlgManager.getNotnLevel(currentTurn.getCurrentNotnLevel()).analogMagStims == true) {
             ncl.openContainer(Constants.LEFT);
         }
@@ -293,6 +296,7 @@ public class NumCompManager implements GameListener {
     }
 
     public void showRightStims() {
+        GameEvents.stimulusPresented(currentTurn, Constants.RIGHT);
         if (numCompAlgManager.getNotnLevel(currentTurn.getCurrentNotnLevel()).analogMagStims == true) {
             ncl.openContainer(Constants.RIGHT);
         }
@@ -313,6 +317,7 @@ public class NumCompManager implements GameListener {
         if (!currentTurn.isDeadlineTrial()) {
             ncl.setActionState(ActionState.CHOOSE);
         }
+        GameEvents.responseEnabled();
     }
 
     public void setSneakInAction(int player) {
@@ -347,7 +352,10 @@ public class NumCompManager implements GameListener {
         currentTurn = nextTurn = new GameTurn(currentTurnNumber + 1);
         initialiseTurn(nextTurn);
 
-        ncl.setBoardLength(numCompAlgManager.getNotnLevel(currentTurn.getCurrentNotnLevel()).boardLength);
+        int boardLength = numCompAlgManager.getNotnLevel(currentTurn.getCurrentNotnLevel()).boardLength;
+        ncl.setBoardLength(boardLength);
+        GameEvents.gameStarted(boardLength, currentTurn.getCurrentNotnLevel());
+        GameEvents.difficultyAdjusted(nextTurn);
 
         return true;
     }
@@ -914,6 +922,7 @@ public class NumCompManager implements GameListener {
         nextTurn = new GameTurn(currentTurnNumber + 1);
         ncl.clearCarpet();
         initialiseTurn(nextTurn);
+        GameEvents.difficultyAdjusted(nextTurn);
         setHazardsForTurn(nextTurn);
 
         //        taskQueue.addTask(new Runnable() {
@@ -935,6 +944,7 @@ public class NumCompManager implements GameListener {
 
     public void playerWins(int playerID) {
         this.lastWinner = playerID;
+        GameEvents.gameEnded(playerID, currentTurnNumber);
         //Method called by any playing piece that reaches the end of the track,
         //Sets in action end of game sequence 
         taskQueue.reset();
@@ -1008,6 +1018,11 @@ public class NumCompManager implements GameListener {
     }
 
     //wrapper functions for alg manager
+    /** Nível de complexidade inicial do aluno atual (1 a 22, ccl.properties). */
+    public int getStartComplexityLevel() {
+        return numCompAlgManager == null ? 1 : numCompAlgManager.getStartLevelIndex() + 1;
+    }
+
     public void newStudent(Student aStudent) {
         //instantiate a new NumCompAlgManager
         numCompAlgManager = new NumCompAlgManager(aStudent.getStartLevel());
@@ -1083,6 +1098,7 @@ public class NumCompManager implements GameListener {
             },
                               3200);
         }
+        GameEvents.timedOut(currentTurn);
     }
 
     /**
@@ -1137,6 +1153,7 @@ public class NumCompManager implements GameListener {
         //Calculate the net relative gain, and the hypothetical net relative gain
         currentTurn.calculateActualWinner();
         ncl.getDataFileHandler().writeStudentFileDataLine(currentTurn);
+        GameEvents.answered(currentTurn, leftrigth);
         Matrix responsePoint = new Matrix(1, AdapDimensions.NUM_ADAP_DIMS + 1);
         responsePoint.setSubMatrix(0, 0, currentTurn.getCurrentDifficulty());
         responsePoint.set(0,

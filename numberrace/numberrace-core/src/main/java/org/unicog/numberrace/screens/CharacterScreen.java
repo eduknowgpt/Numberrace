@@ -1,5 +1,7 @@
 package org.unicog.numberrace.screens;
 
+import org.unicog.numberrace.util.Constants;
+import org.unicog.numberrace.analytics.GameEvents;
 import static org.unicog.numberrace.screens.ScaleUtils.*;
 
 import java.awt.Color;
@@ -148,7 +150,14 @@ public class CharacterScreen extends VirtualMediaPanel implements Screen {
         boolean characterUnlocked = go.getStudent()
                                       .checkForCharacterUnlock(ThemeVariables.getLevel());
         if (characterUnlocked) {
+            int unlocked = -1;
+            for (int c = 0; unlocked < 0 && c < Constants.NUMBER_CHARACTERS; c++) {
+                if (!go.getStudent().getCharacAccess(c, ThemeVariables.getLevel())) {
+                    unlocked = c;
+                }
+            }
             go.getStudent().unlockNextCharacter(ThemeVariables.getLevel());
+            GameEvents.characterUnlocked(unlocked, ThemeVariables.getLevel());
             Student student = go.getStudent();
             ThemeVariables themeVars = go.getTheme();
             for (int i = 0; i < status.length; i++) {

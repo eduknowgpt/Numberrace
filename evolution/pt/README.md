@@ -53,6 +53,7 @@ O Projeto Evolução ADS fornece infraestrutura que pode ser utilizada pelo TCC 
 - [Catálogo preliminar de eventos de interação](catalogo-eventos.md)
 - [Modelo de eventos de interação](modelo-eventos.md)
 - [Estratégia de persistência dos eventos](persistencia-eventos.md)
+- [Componente de registro dos eventos de interação](componente-registro.md)
 
 ## Princípios de evolução
 

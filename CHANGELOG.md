@@ -10,12 +10,19 @@ are documented here.
 - Validated development environment guide (`numberrace/docs/AMBIENTE.pt.md`).
 - Maven reactor for language packs.
 - Eclipse-oriented development workflow.
+- Interaction-data logging component (`org.unicog.numberrace.analytics`): records the
+  23 event types of the interaction event model 1.0 to one JSON Lines file per session
+  (official record) and to a SQLite database (query copy), in a background thread,
+  with validation before writing and pseudonymous participant codes
+  (`evolution/pt/componente-registro.md`).
+- Unit tests (JUnit 4) for the logging component.
 
 ### Changed
 - Reorganized the legacy SVN directory structure.
 - Removed obsolete `trunk`, `tags`, and `branches` hierarchy.
 - Simplified Maven project organization.
 - Improved language-pack build process.
+- `numberrace-core` now depends on `org.xerial:sqlite-jdbc`.
 
 ### Fixed
 - Build from a fresh clone: added the missing legacy JARs (jmat, nenya-media,

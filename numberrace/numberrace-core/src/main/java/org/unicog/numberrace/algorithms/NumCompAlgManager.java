@@ -58,11 +58,18 @@ public class NumCompAlgManager {
     private Random randomNumber = new Random();
     public double[] defaultInitialProbs;
 
+    private int startLevelIndex;
+
     public NumCompAlgManager(String aStartLevel) {
         randomNumber.setSeed(System.currentTimeMillis()); //seed with system time in msec
         //instantiate adaptive algorithm
-        mda = new NewMultiDimAlg(AdapDimensions.NUM_ADAP_DIMS,
-                initializeNotnLevels(aStartLevel));
+        startLevelIndex = initializeNotnLevels(aStartLevel);
+        mda = new NewMultiDimAlg(AdapDimensions.NUM_ADAP_DIMS, startLevelIndex);
+    }
+
+    /** Índice (a partir de 0) do nível de complexidade inicial em ccl.properties. */
+    public int getStartLevelIndex() {
+        return startLevelIndex;
     }
 
     public void setStimAttributes(GameTurn currentTurn) {

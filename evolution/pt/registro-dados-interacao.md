@@ -234,7 +234,55 @@ justificativa. Podem ser revistas pelo orientador.
 
 ---
 
-## 6. Andamento das etapas
+## 6. Etapa 5 — Desenvolvimento do componente de registro (concluída em 09/10/2026)
+
+**Produto previsto no plano:** componente funcional de registro estruturado das interações.
+**Produto:** pacote `org.unicog.numberrace.analytics` no `numberrace-core`, descrito em
+[`componente-registro.md`](componente-registro.md).
+
+### 6.1 Atividades realizadas
+
+| Atividade do plano | O que foi feito |
+|---|---|
+| Implementação da estrutura básica do componente | Pacote `analytics` com 10 classes: adaptador do jogo, núcleo do registro, evento, tipos, validação, JSON, gravação em JSON Lines e em SQLite e registro de participantes |
+| Implementação do registro de sessões | Sessão aberta no cadastro ou seleção do aluno e encerrada na troca de aluno ou no fechamento do jogo, com o motivo; código pseudonimizado do participante |
+| Implementação do registro de eventos | Os 23 tipos do modelo 1.0, com numeração por sessão e contexto de partida e rodada |
+| Integração com os fluxos do jogo | Chamadas de uma linha em 7 classes do jogo (seção 5 do documento), incluindo um ponto novo para os cliques antes da liberação da resposta |
+| Validação dos dados antes da persistência | Regras equivalentes ao JSON Schema da Etapa 3, aplicadas a cada evento antes da gravação |
+| Tratamento de situações de erro | Nenhuma exceção chega ao jogo; falhas do SQLite e do JSON Lines tratadas conforme a Etapa 4 |
+| Refatoração e organização do código | Código do registro concentrado num pacote próprio; alterações mínimas nas classes do jogo; 11 testes automatizados |
+
+### 6.2 Principais resultados
+
+- O jogo passou a gravar os eventos no formato do modelo 1.0, em JSON Lines (registro oficial) e
+  em SQLite (cópia para consulta), sem alterar o registro atual.
+- A gravação ocorre em segundo plano e não interrompe o jogo; falhas do registro aparecem apenas
+  no log.
+- **Teste em ambiente automatizado:** 35 eventos de 17 tipos, em duas sessões, todos válidos pelo
+  JSON Schema e pelas regras de consistência, sem lacunas na sequência e com as mesmas 35 linhas
+  no SQLite.
+- **Teste no Windows** (Eclipse, Java 8 de 32 bits): uma sessão com duas partidas, 180 eventos de
+  21 tipos, todos válidos, sem lacunas na sequência e com as mesmas 180 linhas no SQLite. Os tipos
+  de fim de partida, prazo esgotado, esbarrão e recompensa foram verificados nesse teste. Não
+  ocorreram queda em armadilha nem desbloqueio de personagem (componente, seção 9.3).
+- Três novas observações (seção 6.3).
+
+### 6.3 Novas observações
+
+| # | Observação | Relação com este projeto |
+|---|---|---|
+| 15 | O rótulo da coluna `controlFor` do registro atual está invertido em relação ao comportamento do jogo | O novo registro grava o valor correto; o registro atual não foi alterado |
+| 16 | A pausa automática quando a janela do jogo perde o foco não tem `trigger` previsto no modelo 1.0 | Proposta para a versão 1.1 do modelo (`trigger = window_focus`) |
+| 17 | Os campos opcionais `display_mode` e `sound_key` não são preenchidos nesta versão | Inclusão possível sem mudança no modelo |
+
+### 6.4 Decisões
+
+As sete decisões desta etapa (D24 a D30) estão na seção 11 de `componente-registro.md`, com a
+justificativa. Podem ser revistas pelo orientador.
+
+---
+
+## 7. Andamento das etapas
 
 | Etapa | Descrição | Situação |
 |---|---|---|
@@ -242,8 +290,8 @@ justificativa. Podem ser revistas pelo orientador.
 | 2 | Levantamento dos eventos produzidos pelo jogo (catálogo preliminar) | Concluída |
 | 3 | Modelagem dos eventos de interação | Concluída |
 | 4 | Estratégia de persistência | Concluída |
-| 5 | Desenvolvimento do componente de registro | Próxima |
-| 6 | Exportação e disponibilização dos dados | Pendente |
+| 5 | Desenvolvimento do componente de registro | Concluída |
+| 6 | Exportação e disponibilização dos dados | Próxima |
 | 7 | Testes, validação e integridade dos registros | Pendente |
 | 8 | Documentação e consolidação | Pendente |
 
@@ -255,5 +303,6 @@ da Etapa 3, cada etapa é apresentada em um Pull Request próprio.
 ## Nota sobre o desenvolvimento
 
 Este trabalho é feito por Sávio, com apoio de uma ferramenta de inteligência artificial
-(Claude, da Anthropic) na análise do código, na preparação das correções e na redação da
-documentação. As alterações são acompanhadas e testadas por ele.
+(Claude, da Anthropic) na análise do código, na preparação das correções, na implementação do
+componente de registro, nos testes automatizados e na redação da documentação. As alterações são
+acompanhadas, revisadas e testadas por ele.

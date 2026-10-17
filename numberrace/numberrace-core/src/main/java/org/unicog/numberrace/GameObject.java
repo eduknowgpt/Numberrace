@@ -49,6 +49,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import org.unicog.numberrace.data.DataFileHandler;
+import org.unicog.numberrace.analytics.GameEvents;
 import org.unicog.numberrace.data.Student;
 import org.unicog.numberrace.managers.HazardManager;
 import org.unicog.numberrace.managers.NumCompManager;
@@ -200,6 +201,7 @@ public class GameObject extends NumCompListener {
                 GameObject.this.opponentCharacter = randomNumber.nextInt(4);
                 GameObject.this.getChoiceScreen()
                                .setOpponentCharacter(GameObject.this.opponentCharacter);
+                GameEvents.characterSelected(character, GameObject.this.opponentCharacter);
 
                 GameObject.this.changeState(GameStates.CHOICE);
             } else {
@@ -322,6 +324,7 @@ public class GameObject extends NumCompListener {
                 currentState = tmpState;
                 unpause();
                 if (newState == GameStates.MENU) {
+                    GameEvents.resumed("menu", currentState);
                     return;
                 }
             }
@@ -331,6 +334,7 @@ public class GameObject extends NumCompListener {
                 taskQueue.reset();
                 soundManager.stopAllSounds();
             } else {
+                GameEvents.paused("menu", currentState);
                 pause();
             }
 
@@ -397,6 +401,7 @@ public class GameObject extends NumCompListener {
 
         Utilities.log.info("Changin states : [" + currentState.name()
                 + "] -> [" + newState.name() + "]");
+        GameEvents.screenChanged(currentState, newState);
         //        switch (currentState) {
         //        case START:
         //            //            switch (newState) {
@@ -859,6 +864,7 @@ public class GameObject extends NumCompListener {
             }
 
             public void windowClosing(WindowEvent e) {
+                GameEvents.endRequested("window_closed");
                 changeState(GameStates.END);
             }
 
@@ -927,6 +933,7 @@ public class GameObject extends NumCompListener {
         JButton exitSessionButton = new JButton(new AbstractAction() {
 
             public void actionPerformed(ActionEvent e) {
+                GameEvents.sessionEnded("change_student", getScreenState());
                 getDataFileHandler().exitStudent();
                 getNumCompManager().endGame();
             }
@@ -1010,6 +1017,7 @@ public class GameObject extends NumCompListener {
     }
 
     void stop() {
+        GameEvents.applicationStopping(getScreenState());
         running = false;
         Utilities.log.info("Ending game");
         frameManager.stop();
@@ -1044,6 +1052,7 @@ public class GameObject extends NumCompListener {
 
     public void setTheme(byte theme) {
         getTheme().setLevel(theme);
+        GameEvents.themeSelected(theme);
     }
 
     public NRRunnableQueue getTaskQueue() {
@@ -1053,6 +1062,12 @@ public class GameObject extends NumCompListener {
     public void setStudent(Student tmpStudent) {
         this.player = tmpStudent;
         getDataFileHandler().setStudent(tmpStudent);
+        GameEvents.sessionStarted(tmpStudent, getNumCompManager().getStartComplexityLevel());
+    }
+
+    /** Tela atual, ignorando o menu aberto por cima dela. */
+    public GameStates getScreenState() {
+        return currentState == GameStates.MENU && tmpState != null ? tmpState : currentState;
     }
 
     public Student getStudent() {
@@ -1066,6 +1081,7 @@ public class GameObject extends NumCompListener {
     public void start() {
         //        System.out.println("Start...");
         assert (initialized && !running);
+        GameEvents.applicationStarted();
 
         //        Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
         //
@@ -1167,6 +1183,7 @@ public class GameObject extends NumCompListener {
 
     private final class EndGameAction extends AbstractAction {
         public void actionPerformed(ActionEvent e) {
+            GameEvents.endRequested("quit");
             changeState(GameStates.END);
         }
     }
@@ -1184,7 +1201,11 @@ public class GameObject extends NumCompListener {
             if (!transition) {
                 if (currentState != GameStates.MENU && paused) {
                     unpause();
+                    GameEvents.resumed("pause_key", currentState);
                 } else {
+                    if (!paused) {
+                        GameEvents.paused("pause_key", currentState);
+                    }
                     pause();
                 }
             }
