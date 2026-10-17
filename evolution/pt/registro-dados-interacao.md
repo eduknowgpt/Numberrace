@@ -248,7 +248,7 @@ justificativa. Podem ser revistas pelo orientador.
 | Implementação do registro de sessões | Sessão aberta no cadastro ou seleção do aluno e encerrada na troca de aluno ou no fechamento do jogo, com o motivo; código pseudonimizado do participante |
 | Implementação do registro de eventos | Os 23 tipos do modelo 1.0, com numeração por sessão e contexto de partida e rodada |
 | Integração com os fluxos do jogo | Chamadas de uma linha em 7 classes do jogo (seção 5 do documento), incluindo um ponto novo para os cliques antes da liberação da resposta |
-| Validação dos dados antes da persistência | Regras equivalentes ao JSON Schema da Etapa 3, aplicadas a cada evento antes da gravação |
+| Validação dos dados antes da persistência | Regras de estrutura do JSON Schema da Etapa 3, aplicadas a cada evento antes da gravação; o tipo e o valor de cada campo são conferidos contra o schema nos testes automatizados |
 | Tratamento de situações de erro | Nenhuma exceção chega ao jogo; falhas do SQLite e do JSON Lines tratadas conforme a Etapa 4 |
 | Refatoração e organização do código | Código do registro concentrado num pacote próprio; alterações mínimas nas classes do jogo; 11 testes automatizados |
 
@@ -380,6 +380,34 @@ de sessões simuladas e relatório [`validacao-registros.md`](validacao-registro
 
 As nove decisões desta etapa (D41 a D49) estão na seção 12 de `validacao-registros.md`, com a
 justificativa. Podem ser revistas pelo orientador.
+
+### 8.4 Validação complementar (17/10/2026)
+
+Depois da conclusão da etapa, todo o trabalho entregue foi conferido de novo
+(`validacao-registros.md`, seção 15):
+
+- **Teste diferencial com o JSON Schema:** 10.312 alterações de eventos reais e simulados julgadas
+  pelo schema oficial (com duas bibliotecas independentes, que concordaram em todos os casos) e pelo
+  validador do componente. O validador nunca recusou um evento válido pelo modelo.
+- **Testes de estresse e de robustez:** exportação de 5.473 eventos fora do modelo e de 600 sessões
+  com um evento alterado (95.810 eventos); 36.635 linhas de JSON cortadas ou corrompidas; opções
+  inválidas na linha de comando. A exportação não falhou em nenhum caso depois das correções.
+- **Jogo real executado por programa,** de novo, com o código corrigido e com o arquivo de
+  participantes no formato do Excel em português: 3 sessões, 2 participantes e 984 eventos de 21
+  tipos. O participante cadastrado pela equipe manteve o seu código nas duas execuções, e o arquivo
+  continuou legível depois de um cadastro novo. Nenhum erro nas 21 regras; o único aviso foi o
+  esperado para a sessão interrompida à força.
+- **Problemas encontrados e corrigidos:** um evento com número de partida ou rodada menor que 1
+  impedia o banco do pacote inteiro (P10); o arquivo de participantes salvo pelo Excel em português
+  deixava de ser reconhecido, e o participante recebia um código novo (P11); uma linha corrompida
+  com aninhamento exagerado interrompia a exportação (P12). Reforço: um destino de gravação com
+  defeito não para mais a gravação nos outros. Correção de documentação: a descrição da decisão D27
+  afirmava que as regras do validador eram equivalentes ao JSON Schema; elas conferem a estrutura, e
+  o tipo e o valor dos campos são conferidos nos testes.
+- **Testes automatizados:** de 62 para 100, entre eles a conformidade com o JSON Schema oficial, a
+  regressão com as sessões do jogo real e testes de concorrência, de ida e volta do JSON e do CSV e
+  de entradas estranhas. Todos aprovados em Java 8 e Java 21. Ao todo, a etapa registrou 12
+  problemas: 9 corrigidos e 3 documentados.
 
 ---
 

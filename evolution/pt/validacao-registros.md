@@ -14,11 +14,17 @@ testes de falha da gravação, a execução do jogo por um programa de teste, os
 encontrados e as correções realizadas. Todos os testes usaram **dados simulados**; nenhum dado de
 criança foi coletado.
 
+A seção 15 descreve a **validação complementar** feita em 17/10/2026, depois da conclusão da
+etapa: teste diferencial com o JSON Schema, testes de estresse e de robustez, nova execução do jogo
+por programa e 38 testes automatizados novos (de 62 para 100). Ela encontrou e corrigiu três
+problemas (P10 a P12).
+
 | Local | Conteúdo |
 |---|---|
 | `numberrace-core/src/main/java/org/unicog/numberrace/analytics/export/IntegrityChecker.java` | Verificação de integridade (21 regras) |
 | `numberrace-core/src/test/java/org/unicog/numberrace/analytics/` | Testes automatizados (JUnit 4), entre eles `PersistenceFailureTest` (falhas da gravação) |
-| `numberrace-core/src/test/java/org/unicog/numberrace/analytics/export/` | `IntegrityCheckerTest` (estragos propositais), `SimulatedSessions` (gerador) e `SimulatedSessionsTest` |
+| `numberrace-core/src/test/java/org/unicog/numberrace/analytics/export/` | `IntegrityCheckerTest` (estragos propositais), `SimulatedSessions` (gerador), `SimulatedSessionsTest`, `SchemaConformanceTest` (conformidade com o JSON Schema) e `RealDataRegressionTest` (dados do jogo real) |
+| `numberrace-core/src/test/resources/org/unicog/numberrace/analytics/export/dados-reais/` | Sessões gravadas pelo jogo real na Etapa 7 (teste no Windows e jogo executado por programa), compactadas |
 | [`modelo-eventos.schema.json`](modelo-eventos.schema.json) | JSON Schema do modelo, versão 1.1 (a versão 1.0 está preservada em [`modelo-eventos-1.0.schema.json`](modelo-eventos-1.0.schema.json)) |
 
 ---
@@ -282,13 +288,17 @@ e não um defeito do registro.
 | P7 | O tempo de resposta do registro atual (`NumCompManager`) é medido com o relógio do computador, que pode ser ajustado durante a sessão; o do componente novo usa um cronômetro (`System.nanoTime`) | Análise de inconsistências temporais | Sem alteração no registro atual (decisão D22); documentado |
 | P8 | `SESSION_START.display_mode` não era preenchido (observação 17 da Etapa 5) | Revisão das observações da Etapa 5 | Preenchido com `fullscreen` ou `in_window` |
 | P9 | Nos níveis com números falados, os números do personagem da criança não são reproduzidos: o jogo procura o som pelo algarismo (por exemplo, `friend1_2`), mas `SoundManager` registra esses sons pelo nome do número (`friend1_two`); ouvem-se apenas "mais", "menos" e "igual". O mesmo ocorre na contagem das casas da criança (`friend1_counting_1` procurado, `friend1_counting_counting_one` registrado). Faltam ainda dois arquivos no pacote em português (`Friend1/Numbers/ten.wav` e `Enemy1/Numbers/deux_ennemi.wav`), e não há áudio para números acima de 10 | Registro de execução do jogo por programa (sons solicitados sem correspondência: `friend1_2` 69 vezes, `friend1_3` 65 vezes, entre outros) e teste manual com os áudios em português | Fora do escopo do componente de registro; correção proposta em contribuição separada. Consequência para os dados: `TURN_START.representation.spoken` informa a condição prevista pelo nível, não a reprodução efetiva do som, enquanto o defeito não for corrigido |
+| P10 | A importação aceitava `game_number` ou `turn_number` menores que 1 e campos desconhecidos na parte comum do evento, que o JSON Schema recusa. O banco SQLite do pacote recusa números menores que 1, e um único evento assim fazia o pacote inteiro sair **sem o banco** | Validação complementar: teste diferencial e exportação de eventos alterados (seção 15) | O validador passou a recusar esses eventos, que aparecem no relatório de importação como inválidos; o resto é exportado normalmente, com o banco |
+| P11 | O arquivo `identification/participants.csv` deixava de ser reconhecido depois de aberto e salvo no Excel em português (que grava com ponto e vírgula e na codificação Windows-1252). O participante recebia um código novo, e as sessões seguintes deixavam de ficar ligadas às anteriores | Validação complementar: revisão do código e teste com um arquivo no formato do Excel | Leitura tolerante: cada linha é lida com vírgula ou ponto e vírgula, em UTF-8 ou em Windows-1252; espaços nas pontas dos campos são ignorados |
+| P12 | Uma linha corrompida com milhares de níveis de listas ou objetos (`[[[[...`) esgotava a pilha de execução e interrompia a exportação inteira, sem pacote | Validação complementar: teste de robustez do leitor de JSON | Limite de 64 níveis na leitura (os eventos do modelo têm no máximo quatro); a linha passa a ser relatada como inválida |
 
 ## 11. Testes automatizados
 
-Os testes automatizados passaram de 33 (Etapas 5 e 6) para 62, executados em cada
-`mvn package`. Todos passaram em Java 8 (Temurin 8u504) e Java 21; um deles grava os dados
-simulados numa pasta e só é executado quando essa pasta é informada. O código foi compilado
-também com o compilador do Java 8, sem avisos nas classes do registro e da exportação.
+Os testes automatizados passaram de 33 (Etapas 5 e 6) para 62 na conclusão da etapa e para 100 na
+validação complementar (seção 15), executados em cada `mvn package` (cerca de 22 s). Todos passaram
+em Java 8 (Temurin 8u504) e Java 21; um deles grava os dados simulados numa pasta e só é executado
+quando essa pasta é informada. O código foi compilado também com o compilador do Java 8, sem avisos
+nas classes do registro e da exportação.
 
 | Classe de teste | Testes | O que verifica |
 |---|---|---|
@@ -298,6 +308,24 @@ também com o compilador do Java 8, sem avisos nas classes do registro e da expo
 | `EventValidatorTest` | 5 (+1) | Versão 1.1 rigorosa; `window_focus` aceito na 1.1 e recusado na 1.0 |
 | `ExportToolTest` | 4 | Pacote com os arquivos da verificação de integridade |
 | Demais (Etapas 5 e 6) | 25 | Sem alteração |
+
+Testes acrescentados na validação complementar (17/10/2026):
+
+| Classe de teste | Testes | O que verifica |
+|---|---|---|
+| `SchemaConformanceTest` | 5 | Exemplos do modelo, eventos do jogo real (1.722) e sessões simuladas válidos pelo JSON Schema oficial, conferido por uma biblioteca independente; teste diferencial com cerca de 2.500 alterações de eventos reais: o validador do componente nunca recusa um evento válido pelo modelo, e as alterações de estrutura são recusadas pelos dois |
+| `RealDataRegressionTest` | 4 | Exportação das sessões do jogo real (teste no Windows e jogo executado por programa): contagens, ocorrências de integridade, as duas versões do modelo juntas e o mesmo resultado em exportações repetidas, com as entradas em outra ordem |
+| `JsonRoundTripTest` | 5 | O que é gravado volta igual (textos com aspas, acentos, emoji e caracteres de controle; números); linhas cortadas ou corrompidas são recusadas sem outra exceção; aninhamento exagerado (P12) |
+| `CsvRoundTripTest` | 3 | Textos com separadores, aspas e quebras de linha voltam iguais nas duas versões do CSV; números sem notação científica; BOM só na versão do Excel |
+| `InteractionLoggerConcurrencyTest` | 4 | Oito linhas de execução registrando ao mesmo tempo (sequência e ordem certas); o jogo não espera um destino lento; um destino com defeito não impede os outros; eventos depois de desligar são ignorados |
+| `GameEventsRobustnessTest` | 1 | Todos os métodos do adaptador chamados com valores ausentes ou estranhos, sem nenhuma exceção chegar ao jogo |
+| `ImportEdgeCasesTest` | 5 | BOM, fim de linha do Windows e linhas em branco; lixo binário, linha de 1 MB e aninhamento exagerado; evento com partida 0 não impede o banco (P10); pasta inexistente; pasta de identificação nunca lida |
+| `FilterAndVerifierTest` | 3 | Filtros por data (extremos incluídos), participante e sessão, sempre com sessões inteiras; conferência acusa arquivo alterado, apagado e manifesto estragado |
+| `ParticipantRegistryTest` | +6 | Códigos únicos no alfabeto sem ambiguidade; espaços; código cadastrado pela equipe; arquivo salvo pelo Excel em português (P11) e como CSV UTF-8; pasta impossível |
+| `EventValidatorTest` | +2 | Partida e rodada a partir de 1 (P10); campo desconhecido na parte comum |
+
+Cada teste de correção foi conferido também ao contrário: com o código anterior à correção, ele
+falha.
 
 ## 12. Decisões tomadas
 
@@ -331,6 +359,10 @@ também com o compilador do Java 8, sem avisos nas classes do registro e da expo
   nível e não garante que os números foram ouvidos.
 - O teste de disco cheio foi simulado por programa; não foi executado com um disco realmente
   cheio.
+- O validador usado durante o jogo confere a estrutura do evento (campos, contexto, numeração e
+  tempos), e não o tipo e o valor de cada campo. Um valor fora do modelo produzido por um defeito
+  futuro do jogo seria gravado; ele é detectado pelos testes de conformidade com o JSON Schema
+  (`SchemaConformanceTest`), que precisam ser executados a cada mudança.
 
 ## 14. Como reproduzir
 
@@ -340,7 +372,8 @@ Na pasta `numberrace/`:
 mvn clean package
 ```
 
-executa os 62 testes. Para gravar os dados simulados numa pasta, para conferência por outras
+executa os 100 testes. Os testes de conformidade leem o JSON Schema oficial em
+`evolution/pt/modelo-eventos.schema.json`, procurado a partir da pasta em que os testes rodam. Para gravar os dados simulados numa pasta, para conferência por outras
 ferramentas:
 
 ```
@@ -360,3 +393,21 @@ programa `conferir_pacote.py` (disponível com o autor):
 ```
 python conferir_pacote.py <pasta do pacote> evolution/pt/modelo-eventos.schema.json
 ```
+
+## 15. Validação complementar (17/10/2026)
+
+Depois da conclusão da etapa, todo o trabalho entregue foi conferido de novo, com o objetivo de
+encontrar o que os testes anteriores não tinham coberto.
+
+| Verificação | Como foi feita | Resultado |
+|---|---|---|
+| Ramos enviados | Compilação e testes de cada ramo com Pull Request aberto, em Java 21; o último também em Java 8 | Todos aprovados; nenhum arquivo fora do escopo nos ramos |
+| Validador × modelo (teste diferencial) | 10.312 alterações de 169 eventos representativos, tirados de 3.451 eventos reais e simulados: campo removido, valor de outro tipo, número fora da faixa, campo a mais. Cada alteração foi julgada pelo JSON Schema, com duas bibliotecas independentes (Python e Java, que concordaram em todos os casos), e pelo validador do componente | O validador nunca recusou um evento válido pelo modelo. Ele deixava passar números de partida e rodada menores que 1 e campos a mais na parte comum (P10). Depois da correção, as diferenças restantes são só o tipo e o valor dos campos de `data`, conferidos pelos testes de conformidade |
+| Estresse da exportação | Os 5.473 eventos inválidos pelo modelo e aceitos pelo validador, cada um numa sessão; e 600 sessões completas com um evento alterado (95.810 eventos) | Nenhuma falha da exportação; 18.508 erros e 10.763 avisos de integridade relatados no primeiro caso. Antes da correção P10, o banco do pacote não era gerado |
+| Leitor de JSON | 36.635 linhas cortadas em cada posição ou com caracteres trocados, e linhas com 10.000 e 100.000 níveis de aninhamento | Nenhuma exceção inesperada nas linhas cortadas; o aninhamento profundo interrompia a exportação (P12), corrigido |
+| Linha de comando | Opção sem valor, opção desconhecida, data inválida, período invertido, pasta inexistente, conferência sem manifesto, filtros sem resultado | Mensagens e códigos de saída corretos; a mensagem de pasta inexistente passou a mostrar o caminho informado |
+| Código | Leitura do registro, da gravação, dos códigos de participante, dos filtros e da escrita de CSV | Problema P11 (arquivo de participantes editado no Excel). Reforço: se um destino de gravação deixar escapar um erro, a gravação nos outros continua (antes, a linha de execução de gravação pararia) |
+| Documentação | Afirmações conferidas contra o código | A decisão D27 dizia que as regras do validador eram equivalentes ao JSON Schema; o texto foi corrigido em `componente-registro.md`: as regras conferem a estrutura, e o tipo e o valor de cada campo são conferidos nos testes |
+| Jogo real executado por programa | Duas execuções do jogo com o código corrigido, pelo mesmo programa de teste da seção 8 (Java 8, sem placa de som), num computador cujo arquivo `identification/participants.csv` foi preparado no formato do Excel em português (ponto e vírgula e Windows-1252), com o participante `P017` cadastrado pela equipe. A primeira execução foi interrompida pelo limite de tempo do programa de teste no meio da sétima partida, o que equivale a um encerramento forçado; a segunda terminou com a troca de aluno e o fechamento da janela | 3 sessões, 2 participantes e 984 eventos da versão 1.1, de 21 tipos: 13 armadilhas, 10 prazos esgotados, recompensas de seis tipos, pausas por tecla, menu e perda de foco e encerramentos por troca de aluno, fechamento da janela e interrupção. O participante `P017` foi reconhecido nas duas execuções (sessões 1 e 2), e o participante novo foi acrescentado ao mesmo arquivo; relido depois, o arquivo com as duas formas continuou reconhecendo os três participantes. Com o código anterior, o mesmo arquivo dava um código novo ao `P017` (P11). Nenhum erro nas 21 regras; um aviso R04, o esperado para a sessão interrompida |
+
+Os testes automatizados que registram essas verificações estão na seção 11.
