@@ -78,4 +78,23 @@ public class EventValidatorTest {
         assertTrue(EventValidator.validateParsed(lido(pausa.replace("\"1.1\"", "\"1.0\"")))
                 .toString().contains("window_focus não existe na versão 1.0"));
     }
+
+    @Test
+    public void partidaOuRodadaMenorQueUmEInvalida() {
+        // P10: o banco do pacote recusa esses valores; antes, um evento assim impedia o banco inteiro
+        assertTrue(EventValidator.validateParsed(lido(LINHA.replace("\"game_number\":1", "\"game_number\":0")))
+                .toString().contains("game_number menor que 1"));
+        assertTrue(EventValidator.validateParsed(lido(LINHA.replace("\"turn_number\":1", "\"turn_number\":-1")))
+                .toString().contains("turn_number menor que 1"));
+        assertTrue(EventValidator.validate(evento(EventType.CLICK_IGNORED, 0, 1, Json.obj("side", "left")))
+                .toString().contains("game_number menor que 1"));
+    }
+
+    @Test
+    public void campoDesconhecidoNoEnvelopeEInvalidoNasVersoesConhecidas() {
+        String extra = LINHA.replace("\"data\":", "\"computador\":\"sala 2\",\"data\":");
+        assertTrue(EventValidator.validateParsed(lido(extra)).toString().contains("campo não previsto no evento: computador"));
+        // numa versão 1.x mais nova, um campo novo no envelope é aceito (leitura tolerante)
+        assertEquals("[]", EventValidator.validateParsed(lido(extra.replace("\"1.0\"", "\"1.2\""))).toString());
+    }
 }

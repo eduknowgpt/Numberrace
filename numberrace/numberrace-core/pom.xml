@@ -28,5 +28,8 @@
     <!-- Registro de interação (cópia para consulta em SQLite; ver evolution/pt/persistencia-eventos.md) -->
     <dependency><groupId>org.xerial</groupId><artifactId>sqlite-jdbc</artifactId><version>3.53.4.0</version></dependency>
     <dependency><groupId>junit</groupId><artifactId>junit</artifactId><version>4.13.2</version><scope>test</scope></dependency>
+    <!-- Testes: conferência dos eventos contra o JSON Schema oficial (evolution/pt/modelo-eventos.schema.json) -->
+    <dependency><groupId>com.networknt</groupId><artifactId>json-schema-validator</artifactId><version>1.5.9</version><scope>test</scope></dependency>
+    <dependency><groupId>org.slf4j</groupId><artifactId>slf4j-nop</artifactId><version>2.0.17</version><scope>test</scope></dependency>
   </dependencies>
 </project>

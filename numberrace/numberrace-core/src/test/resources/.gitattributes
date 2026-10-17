@@ -1,2 +1,3 @@
 # Dados de teste em JSON Lines: sempre LF, como o jogo grava
 *.jsonl text eol=lf
+*.gz binary

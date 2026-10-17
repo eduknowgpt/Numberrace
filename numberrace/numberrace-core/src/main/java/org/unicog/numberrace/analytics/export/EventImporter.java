@@ -57,7 +57,7 @@ final class EventImporter {
             File input = inputs.get(i);
             String prefix = inputs.size() > 1 ? "entrada " + (i + 1) + "/" : "";
             if (!input.exists()) {
-                report.fileErrors.add(prefix + input.getName() + ": não existe");
+                report.fileErrors.add(prefix + input.getPath() + ": pasta ou arquivo não encontrado");
                 continue;
             }
             List<File> files = new ArrayList<File>();

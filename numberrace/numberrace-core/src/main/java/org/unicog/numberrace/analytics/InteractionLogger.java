@@ -249,11 +249,15 @@ public final class InteractionLogger {
                 }
                 InteractionEvent e = (InteractionEvent) item;
                 for (EventSink sink : sinks) {
-                    sink.write(e);
-                }
-                if (e.getEventType() == EventType.SESSION_END) {
-                    for (EventSink sink : sinks) {
-                        sink.sessionEnded(e.getSessionId());
+                    try {
+                        sink.write(e);
+                        if (e.getEventType() == EventType.SESSION_END) {
+                            sink.sessionEnded(e.getSessionId());
+                        }
+                    } catch (Throwable t) {
+                        // cada destino trata os próprios erros; esta é só uma segunda proteção, para
+                        // que um destino com defeito não pare a gravação nos outros
+                        LOG.log(Level.WARNING, "Falha num destino de gravação", t);
                     }
                 }
             }
@@ -263,7 +267,11 @@ public final class InteractionLogger {
             LOG.log(Level.SEVERE, "Erro inesperado no gravador de eventos", t);
         } finally {
             for (EventSink sink : sinks) {
-                sink.close();
+                try {
+                    sink.close();
+                } catch (Throwable t) {
+                    LOG.log(Level.WARNING, "Falha ao fechar um destino de gravação", t);
+                }
             }
         }
     }
