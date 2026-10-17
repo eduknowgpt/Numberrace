@@ -1,6 +1,5 @@
 package org.unicog.numberrace.sound;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Set;
@@ -166,14 +165,9 @@ public class SoundPlayer extends ThreadPoolExecutor implements PlayerControls {
 
         if (source != null) {
 
-            if (source.markSupported()) {
-                try {
-                    source.reset();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
+            // The stream must not be reset here: it is already at the start of
+            // the audio data, while the mark of the underlying stream is at the
+            // start of the file, so a reset played the WAV header as a click.
             RunnablePlayerControls player = findPlayer(source, loop, l);
             if (player != null) {
                 playersList.add(player);

@@ -26,5 +26,8 @@ are documented here.
 - Corrected localized audio references from `.ogg` to `.wav`.
 - Fixed WAV loading from compressed language-pack JARs using buffered
   streams.
+- Removed the click heard at the start of every sound: `SoundPlayer.play` no longer
+  resets the audio stream, which, with the buffered streams above, moved it back to
+  the start of the file and played the WAV header as sound.
 - Fixed Portuguese localized resource loading.
 - Improved diagnostics for missing audio resources.
