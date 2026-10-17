@@ -140,8 +140,15 @@ public final class Json {
 
     private static final class Parser {
 
+        /**
+         * Profundidade máxima de objetos e listas. Os eventos do modelo têm no máximo quatro
+         * níveis; o limite evita que uma linha corrompida com milhares de níveis estoure a pilha.
+         */
+        private static final int MAX_DEPTH = 64;
+
         private final String s;
         private int pos;
+        private int depth;
 
         Parser(String s) {
             this.s = s;
@@ -152,10 +159,13 @@ public final class Json {
                 throw error("fim inesperado");
             }
             char c = s.charAt(pos);
-            if (c == '{') {
-                return object();
-            } else if (c == '[') {
-                return array();
+            if (c == '{' || c == '[') {
+                if (++depth > MAX_DEPTH) {
+                    throw error("mais de " + MAX_DEPTH + " níveis de objetos e listas");
+                }
+                Object nested = c == '{' ? object() : array();
+                depth--;
+                return nested;
             } else if (c == '"') {
                 return string();
             } else if (c == '-' || (c >= '0' && c <= '9')) {
