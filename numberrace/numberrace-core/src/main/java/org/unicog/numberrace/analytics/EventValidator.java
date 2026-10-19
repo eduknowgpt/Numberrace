@@ -1,5 +1,7 @@
 package org.unicog.numberrace.analytics;
 
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,10 +16,12 @@ import java.util.regex.Pattern;
  * Validação de um evento antes da gravação: campos obrigatórios da parte comum, contexto de
  * partida e rodada conforme o tipo, campos obrigatórios e permitidos da parte específica e
  * durações não negativas. A conformidade completa com o JSON Schema é verificada nos testes.
+ * Também valida eventos lidos de arquivos ({@link #validateParsed}), usados na exportação.
  */
 public final class EventValidator {
 
     private static final Pattern PARTICIPANT = Pattern.compile("[A-Za-z0-9_-]{1,32}");
+    private static final Pattern UUID = Pattern.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");
 
     private static final Map<EventType, Set<String>> REQUIRED = new EnumMap<EventType, Set<String>>(EventType.class);
     private static final Map<EventType, Set<String>> OPTIONAL = new EnumMap<EventType, Set<String>>(EventType.class);
@@ -110,5 +114,99 @@ public final class EventValidator {
             }
         }
         return problems;
+    }
+
+    /**
+     * Valida um evento lido de um arquivo JSON Lines (já convertido por {@link Json#parse}).
+     * Aceita qualquer versão 1.x do modelo. Na versão 1.0, tipos e campos desconhecidos são
+     * problemas; em versões 1.x mais novas, são aceitos (leitura tolerante, modelo seção 11).
+     */
+    public static List<String> validateParsed(Map<String, Object> m) {
+        List<String> problems = new ArrayList<String>();
+        Object version = m.get("schema_version");
+        if (!(version instanceof String) || !((String) version).startsWith("1.")) {
+            problems.add("schema_version ausente ou não suportada: " + version);
+            return problems;
+        }
+        boolean tolerant = !InteractionEvent.SCHEMA_VERSION.equals(version);
+        String eventId = text(m, "event_id", problems);
+        String sessionId = text(m, "session_id", problems);
+        String participantId = text(m, "participant_id", problems);
+        String typeName = text(m, "event_type", problems);
+        String timestamp = text(m, "timestamp", problems);
+        if (eventId != null && !UUID.matcher(eventId).matches()) {
+            problems.add("event_id não é um UUID: " + eventId);
+        }
+        if (sessionId != null && !UUID.matcher(sessionId).matches()) {
+            problems.add("session_id não é um UUID: " + sessionId);
+        }
+        OffsetDateTime time = null;
+        if (timestamp != null) {
+            try {
+                time = OffsetDateTime.parse(timestamp);
+            } catch (DateTimeParseException e) {
+                problems.add("timestamp inválido: " + timestamp);
+            }
+        }
+        Integer sequence = integer(m, "sequence_number", true, problems);
+        Integer game = integer(m, "game_number", false, problems);
+        Integer turn = integer(m, "turn_number", false, problems);
+        Object activity = m.get("activity");
+        if (activity != null && !(activity instanceof String)) {
+            problems.add("activity não é texto");
+        }
+        Object data = m.get("data");
+        if (!(data instanceof Map)) {
+            problems.add("data ausente ou não é um objeto");
+        }
+        EventType type = null;
+        if (typeName != null) {
+            try {
+                type = EventType.valueOf(typeName);
+            } catch (IllegalArgumentException e) {
+                if (!tolerant) {
+                    problems.add("event_type desconhecido: " + typeName);
+                }
+                return problems; // tipo de uma versão mais nova: não há regras para conferir
+            }
+        }
+        if (!problems.isEmpty()) {
+            return problems;
+        }
+        @SuppressWarnings("unchecked")
+        Map<String, Object> dataMap = (Map<String, Object>) data;
+        InteractionEvent e = new InteractionEvent(eventId, type, time, sessionId, participantId,
+                sequence.intValue(), (String) activity, game, turn, dataMap);
+        for (String problem : validate(e)) {
+            if (!(tolerant && problem.startsWith("campo não previsto"))) {
+                problems.add(problem);
+            }
+        }
+        return problems;
+    }
+
+    private static String text(Map<String, Object> m, String key, List<String> problems) {
+        Object v = m.get(key);
+        if (v instanceof String && ((String) v).length() > 0) {
+            return (String) v;
+        }
+        problems.add(key + " ausente ou não é texto");
+        return null;
+    }
+
+    private static Integer integer(Map<String, Object> m, String key, boolean required, List<String> problems) {
+        Object v = m.get(key);
+        if (v == null) {
+            if (required) {
+                problems.add(key + " ausente");
+            }
+            return null;
+        }
+        if (v instanceof Long && ((Long) v).longValue() >= Integer.MIN_VALUE
+                && ((Long) v).longValue() <= Integer.MAX_VALUE) {
+            return Integer.valueOf(((Long) v).intValue());
+        }
+        problems.add(key + " não é um número inteiro: " + v);
+        return null;
     }
 }

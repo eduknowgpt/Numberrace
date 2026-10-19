@@ -282,7 +282,51 @@ justificativa. Podem ser revistas pelo orientador.
 
 ---
 
-## 7. Andamento das etapas
+## 7. Etapa 6 — Exportação e disponibilização dos dados (concluída em 11/10/2026)
+
+**Produto previsto no plano:** mecanismo de exportação dos dados de interação.
+**Produto:** exportador (`org.unicog.numberrace.analytics.export`) e pacote de exportação,
+descritos em [`exportacao-dados.md`](exportacao-dados.md).
+
+### 7.1 Atividades realizadas
+
+| Atividade do plano | O que foi feito |
+|---|---|
+| Investigação dos formatos de exportação | Seis formatos comparados (JSON Lines, CSV, SQLite, planilha do Excel, JSON único e Parquet) e teste de abertura de CSVs no Excel em português |
+| Definição do formato adotado | Pacote de exportação com dado bruto, tabelas em CSV (versão padrão e versão para o Excel em português), banco SQLite, dicionário de dados, LEIA-ME, relatório e manifesto |
+| Implementação da exportação | Programa separado do jogo, com reunião de dados de vários computadores, filtros por sessão, participante e período, tabelas por evento, sessão e rodada e `exportar.bat` |
+| Validação dos arquivos produzidos | Conferência automática de cada pacote com o manifesto (SHA-256, tamanho, linhas e colunas) e opção `--verificar` para quem recebe o pacote |
+| Testes de recuperação e leitura dos dados | 22 testes automatizados novos; cenários com vários computadores, linhas cortadas, repetições e grande volume; leitura independente dos pacotes em Python |
+| Documentação do mecanismo | `exportacao-dados.md`, LEIA-ME gerado em cada pacote e dicionário de dados |
+
+### 7.2 Principais resultados
+
+- Os dados de um ou de vários computadores são reunidos sem repetição, com relatório dos
+  problemas encontrados (linhas cortadas, eventos inválidos, conflitos, eventos ausentes e
+  sessões sem fim).
+- O pacote atende diferentes usos: planilha (tabela com uma linha por rodada), R e Python, SQL e
+  o dado bruto completo.
+- No teste com o Excel em português, só o CSV com ponto e vírgula abriu em colunas com dois
+  cliques, e contas como `6-2` foram convertidas em datas; por isso há duas versões do CSV e as
+  contas ficam em colunas separadas.
+- **Testes:** 33 testes automatizados aprovados em Java 8 e Java 21; reunião de três pastas (443
+  eventos de 7 sessões, 180 repetições ignoradas, linha cortada relatada); 108.000 eventos
+  exportados com 128 MB de memória em cerca de 20 s; 31 verificações independentes em Python sem
+  erros.
+- **Teste no Windows** (Eclipse, Java 8 de 32 bits): exportação da sessão de teste da Etapa 5 (180
+  eventos) sem problemas; tabela por rodada aberta corretamente no Excel em português, com as
+  contas em colunas separadas; uma alteração proposital em um arquivo do pacote foi detectada pela
+  conferência. O teste também revelou uma falha de um teste automatizado causada pela conversão do
+  fim de linha pelo Git no Windows, corrigida (`exportacao-dados.md`, seção 10.4).
+
+### 7.3 Decisões
+
+As dez decisões desta etapa (D31 a D40) estão na seção 11 de `exportacao-dados.md`, com a
+justificativa. Podem ser revistas pelo orientador.
+
+---
+
+## 8. Andamento das etapas
 
 | Etapa | Descrição | Situação |
 |---|---|---|
@@ -291,8 +335,8 @@ justificativa. Podem ser revistas pelo orientador.
 | 3 | Modelagem dos eventos de interação | Concluída |
 | 4 | Estratégia de persistência | Concluída |
 | 5 | Desenvolvimento do componente de registro | Concluída |
-| 6 | Exportação e disponibilização dos dados | Próxima |
-| 7 | Testes, validação e integridade dos registros | Pendente |
+| 6 | Exportação e disponibilização dos dados | Concluída |
+| 7 | Testes, validação e integridade dos registros | Próxima |
 | 8 | Documentação e consolidação | Pendente |
 
 As Etapas 1 e 2 foram incorporadas a este repositório pelo Pull Request #1 (01/10/2026). A partir
@@ -304,5 +348,5 @@ da Etapa 3, cada etapa é apresentada em um Pull Request próprio.
 
 Este trabalho é feito por Sávio, com apoio de uma ferramenta de inteligência artificial
 (Claude, da Anthropic) na análise do código, na preparação das correções, na implementação do
-componente de registro, nos testes automatizados e na redação da documentação. As alterações são
-acompanhadas, revisadas e testadas por ele.
+componente de registro e do exportador, nos testes automatizados e na redação da documentação.
+As alterações são acompanhadas, revisadas e testadas por ele.
