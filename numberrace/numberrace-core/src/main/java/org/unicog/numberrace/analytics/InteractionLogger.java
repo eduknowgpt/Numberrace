@@ -1,6 +1,7 @@
 package org.unicog.numberrace.analytics;
 
 import java.io.File;
+import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,7 @@ public final class InteractionLogger {
     private List<EventSink> sinks;
     private ParticipantRegistry registry;
     private volatile boolean enabled;
+    private Clock clock = Clock.systemDefaultZone();
 
     private String sessionId;
     private String participantId;
@@ -50,6 +52,13 @@ public final class InteractionLogger {
         return INSTANCE;
     }
 
+    /** Relógio usado no {@code timestamp} dos eventos (substituído nos testes do relógio que volta). */
+    void setClock(Clock c) {
+        synchronized (lock) {
+            clock = c;
+        }
+    }
+
     /**
      * Liga o registro, com os dados em {@code <appDir>/interaction-data} e a identificação em
      * {@code <appDir>/identification}.
@@ -59,17 +68,24 @@ public final class InteractionLogger {
     }
 
     void start(File appDir, boolean useSqlite) {
+        File dataDir = new File(appDir, DATA_DIR);
+        List<EventSink> list = new ArrayList<EventSink>();
+        list.add(new JsonLinesSink(new File(dataDir, "events")));
+        if (useSqlite) {
+            list.add(new SqliteSink(new File(dataDir, "interaction.db"), new File(dataDir, "native")));
+        }
+        start(appDir, list);
+    }
+
+    /** Liga o registro com os destinos informados (usado também nos testes de falha de gravação). */
+    void start(File appDir, List<EventSink> destinations) {
         synchronized (lock) {
             if (enabled) {
                 return;
             }
             try {
                 File dataDir = new File(appDir, DATA_DIR);
-                sinks = new ArrayList<EventSink>();
-                sinks.add(new JsonLinesSink(new File(dataDir, "events")));
-                if (useSqlite) {
-                    sinks.add(new SqliteSink(new File(dataDir, "interaction.db"), new File(dataDir, "native")));
-                }
+                sinks = destinations;
                 registry = new ParticipantRegistry(new File(appDir, IDENTIFICATION_DIR));
                 queue = new LinkedBlockingQueue<Object>();
                 final BlockingQueue<Object> q = queue;
@@ -188,7 +204,7 @@ public final class InteractionLogger {
     private void enqueue(EventType type, Map<String, Object> data) {
         try {
             boolean withGame = type.getScope() != EventType.Scope.SESSION || gameNumber != null;
-            InteractionEvent e = new InteractionEvent(UUID.randomUUID().toString(), type, OffsetDateTime.now(),
+            InteractionEvent e = new InteractionEvent(UUID.randomUUID().toString(), type, OffsetDateTime.now(clock),
                     sessionId, participantId, sequence + 1, withGame ? activity : null,
                     withGame ? gameNumber : null, withGame ? turnNumber : null, data);
             List<String> problems = EventValidator.validate(e);
@@ -233,11 +249,15 @@ public final class InteractionLogger {
                 }
                 InteractionEvent e = (InteractionEvent) item;
                 for (EventSink sink : sinks) {
-                    sink.write(e);
-                }
-                if (e.getEventType() == EventType.SESSION_END) {
-                    for (EventSink sink : sinks) {
-                        sink.sessionEnded(e.getSessionId());
+                    try {
+                        sink.write(e);
+                        if (e.getEventType() == EventType.SESSION_END) {
+                            sink.sessionEnded(e.getSessionId());
+                        }
+                    } catch (Throwable t) {
+                        // cada destino trata os próprios erros; esta é só uma segunda proteção, para
+                        // que um destino com defeito não pare a gravação nos outros
+                        LOG.log(Level.WARNING, "Falha num destino de gravação", t);
                     }
                 }
             }
@@ -247,7 +267,11 @@ public final class InteractionLogger {
             LOG.log(Level.SEVERE, "Erro inesperado no gravador de eventos", t);
         } finally {
             for (EventSink sink : sinks) {
-                sink.close();
+                try {
+                    sink.close();
+                } catch (Throwable t) {
+                    LOG.log(Level.WARNING, "Falha ao fechar um destino de gravação", t);
+                }
             }
         }
     }

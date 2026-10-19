@@ -24,7 +24,7 @@ import org.unicog.numberrace.vars.ThemeVariables;
 
 /**
  * Ponte entre o jogo e o componente de registro: traduz o que acontece no jogo em eventos do
- * modelo 1.0. É a única classe do pacote que conhece as classes do jogo; cada ponto do jogo
+ * modelo 1.1. É a única classe do pacote que conhece as classes do jogo; cada ponto do jogo
  * chama um método daqui com uma linha. Nenhum método lança exceção para o jogo.
  */
 public final class GameEvents {
@@ -40,6 +40,7 @@ public final class GameEvents {
     private static long responseEnabledNanos;
     private static int tooFarAttempts;
     private static boolean pauseOpen;
+    private static String displayMode;
 
     private GameEvents() {
     }
@@ -62,6 +63,11 @@ public final class GameEvents {
         }
     }
 
+    /** Modo de exibição escolhido ao abrir o jogo (tela cheia ou janela). */
+    public static void displayMode(boolean fullscreen) {
+        displayMode = fullscreen ? "fullscreen" : "in_window";
+    }
+
     /** Aluno selecionado ou cadastrado: abre a sessão. */
     public static void sessionStarted(Student student, int startComplexityLevel) {
         try {
@@ -73,12 +79,16 @@ public final class GameEvents {
             gameInProgress = false;
             pendingEndReason = null;
             pauseOpen = false;
-            LOGGER.startSession(participant, Json.obj(
+            Map<String, Object> data = Json.obj(
                     "session_number", Integer.valueOf(student.getSessionNumber()),
                     "start_level", startLevel(student.getStartLevel(), startComplexityLevel),
                     "start_complexity_level", Integer.valueOf(startComplexityLevel),
                     "language", language(),
-                    "app_version", appVersion()));
+                    "app_version", appVersion());
+            if (displayMode != null) {
+                data.put("display_mode", displayMode);
+            }
+            LOGGER.startSession(participant, data);
         } catch (Throwable t) {
             fail("sessionStarted", t);
         }
@@ -149,7 +159,10 @@ public final class GameEvents {
         }
     }
 
-    /** Pausa pela tecla F8 ({@code pause_key}) ou pela abertura do menu ({@code menu}). */
+    /**
+     * Pausa pela tecla F8 ({@code pause_key}), pela abertura do menu ({@code menu}) ou porque a
+     * janela do jogo perdeu o foco ({@code window_focus}, modelo 1.1).
+     */
     public static void paused(String trigger, GameStates screen) {
         try {
             if (pauseOpen || !LOGGER.inSession()) {
@@ -174,10 +187,11 @@ public final class GameEvents {
         }
     }
 
+    /** {@code rewardType}: índice do jogo, de 0 a 6; o modelo numera os animais de 1 a 7. */
     public static void rewardSaved(int rewardType, byte theme) {
         try {
             LOGGER.log(EventType.REWARD_SAVED, Json.obj(
-                    "reward_type", Integer.valueOf(rewardType),
+                    "reward_type", Integer.valueOf(rewardType + 1),
                     "theme", themeName(theme)));
         } catch (Throwable t) {
             fail("rewardSaved", t);

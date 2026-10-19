@@ -3,6 +3,8 @@ package org.unicog.numberrace.analytics;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
@@ -13,7 +15,7 @@ import java.util.logging.Logger;
  * {@code events/<participant_id>/<AAAA-MM-DD>_<HHMMSS>_<session_id>.jsonl}. Cada evento é
  * acrescentado numa linha e forçado ao disco antes do próximo.
  */
-final class JsonLinesSink implements EventSink {
+class JsonLinesSink implements EventSink {
 
     private static final Logger LOG = Logger.getLogger("org.unicog.numberrace.analytics");
     private static final Charset UTF8 = Charset.forName("UTF-8");
@@ -22,7 +24,7 @@ final class JsonLinesSink implements EventSink {
     private final File eventsDir;
     private String currentSession;
     private File currentFile;
-    private FileOutputStream out;
+    private OutputStream out;
 
     JsonLinesSink(File eventsDir) {
         this.eventsDir = eventsDir;
@@ -45,16 +47,47 @@ final class JsonLinesSink implements EventSink {
                 if (!dir.isDirectory() && !dir.mkdirs()) {
                     throw new IOException("Não foi possível criar " + dir);
                 }
-                out = new FileOutputStream(currentFile, true);
+                endPartialLine(currentFile);
+                out = open(currentFile);
             }
             out.write((e.toJson() + "\n").getBytes(UTF8));
             out.flush();
-            out.getChannel().force(false);
+            if (out instanceof FileOutputStream) {
+                ((FileOutputStream) out).getChannel().force(false);
+            }
         } catch (Throwable t) {
             LOG.log(Level.SEVERE, "Falha ao gravar o evento " + e.getSequenceNumber() + " em " + currentFile
                     + "; nova tentativa no próximo evento", t);
             closeQuietly();
         }
+    }
+
+    /**
+     * Se uma gravação anterior parou no meio de uma linha (disco cheio, por exemplo), termina essa
+     * linha antes de acrescentar a próxima. Assim o pedaço incompleto fica numa linha sozinho e o
+     * evento seguinte continua legível.
+     */
+    private static void endPartialLine(File f) throws IOException {
+        if (!f.isFile() || f.length() == 0) {
+            return;
+        }
+        RandomAccessFile raf = new RandomAccessFile(f, "rw");
+        try {
+            raf.seek(raf.length() - 1);
+            if (raf.read() != '\n') {
+                raf.seek(raf.length());
+                raf.write('\n');
+                LOG.warning("Linha incompleta no fim de " + f + " (gravação interrompida); o próximo evento começa "
+                        + "numa linha nova");
+            }
+        } finally {
+            raf.close();
+        }
+    }
+
+    /** Abre o arquivo para acrescentar linhas (substituído nos testes de falha de gravação). */
+    OutputStream open(File f) throws IOException {
+        return new FileOutputStream(f, true);
     }
 
     public void sessionEnded(String sessionId) {

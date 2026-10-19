@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Evento de interação do Number Race",
-  "description": "Modelo de eventos de interação, versão 1.0. Cada evento tem uma parte comum (campos do primeiro nível) e uma parte específica do tipo (campo data). Especificação completa em modelo-eventos.md.",
+  "description": "Modelo de eventos de interação, versão 1.1 (compatível com a 1.0: valida eventos das duas versões). A versão 1.0 está preservada em modelo-eventos-1.0.schema.json. Cada evento tem uma parte comum (campos do primeiro nível) e uma parte específica do tipo (campo data). Especificação completa em modelo-eventos.md.",
   "type": "object",
   "required": [
     "schema_version",
@@ -16,9 +16,12 @@
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "description": "Versão do modelo usada para escrever o evento.",
+      "description": "Versão do modelo usada para escrever o evento. Este schema aceita 1.0 e 1.1.",
       "type": "string",
-      "const": "1.0"
+      "enum": [
+        "1.0",
+        "1.1"
+      ]
     },
     "event_id": {
       "description": "Identificador único do evento (UUID versão 4).",
@@ -518,6 +521,39 @@
           }
         }
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "const": "1.0"
+          },
+          "event_type": {
+            "enum": [
+              "PAUSE",
+              "RESUME"
+            ]
+          }
+        },
+        "required": [
+          "schema_version",
+          "event_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "properties": {
+              "trigger": {
+                "enum": [
+                  "pause_key",
+                  "menu"
+                ]
+              }
+            }
+          }
+        }
+      }
     }
   ],
   "$defs": {
@@ -753,11 +789,12 @@
       "additionalProperties": false,
       "properties": {
         "trigger": {
-          "description": "Origem da pausa ou da retomada: tecla F8 ou menu (Esc).",
+          "description": "Origem da pausa ou da retomada: tecla F8, menu (Esc) ou perda e recuperação do foco da janela do jogo (window_focus, a partir da versão 1.1).",
           "type": "string",
           "enum": [
             "pause_key",
-            "menu"
+            "menu",
+            "window_focus"
           ]
         },
         "screen": {

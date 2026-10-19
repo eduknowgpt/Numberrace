@@ -7,11 +7,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Um evento de interação no modelo 1.0: parte comum (envelope) e parte específica ({@code data}).
+ * Um evento de interação no modelo 1.1: parte comum (envelope) e parte específica ({@code data}).
  */
 public final class InteractionEvent {
 
-    public static final String SCHEMA_VERSION = "1.0";
+    /** Versão do modelo gravada pelo jogo. */
+    public static final String SCHEMA_VERSION = "1.1";
 
     static final DateTimeFormatter TIMESTAMP = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 

@@ -1047,7 +1047,8 @@ public class NumCompManager implements GameListener {
     public void successfullSneak() {
         //Note: if the child misses the deadline, their response is always coded as false
         responseHandled = true;
-        ncl.opponentTalks("enemy1_iTookTheMost"); //$NON-NLS-1$
+        // a fala do adversário passou para o fim do método, depois do registro do prazo esgotado
+        // (antes, o evento da fala era gravado antes do próprio prazo esgotado)
 
         Matrix responsePoint = new Matrix(1, AdapDimensions.NUM_ADAP_DIMS + 1);
         int[] numbers = currentTurn.getNumbers();
@@ -1099,6 +1100,7 @@ public class NumCompManager implements GameListener {
                               3200);
         }
         GameEvents.timedOut(currentTurn);
+        ncl.opponentTalks("enemy1_iTookTheMost"); //$NON-NLS-1$
     }
 
     /**

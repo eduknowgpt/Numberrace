@@ -1,14 +1,17 @@
 package org.unicog.numberrace.analytics;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.CodingErrorAction;
 import java.security.SecureRandom;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -19,7 +22,9 @@ import java.util.logging.Logger;
 /**
  * Correspondência entre participante (sobrenome e nome do cadastro do jogo) e código
  * pseudonimizado. Fica em {@code identification/participants.csv}, fora da pasta de dados de
- * interação, e nunca é exportada. A equipe de pesquisa pode editar os códigos no arquivo.
+ * interação, e nunca é exportada. A equipe de pesquisa pode editar os códigos no arquivo, inclusive
+ * no Excel em português: cada linha é lida com vírgula ou ponto e vírgula, em UTF-8 ou em
+ * Windows-1252.
  */
 public final class ParticipantRegistry {
 
@@ -27,6 +32,7 @@ public final class ParticipantRegistry {
     private static final String HEADER = "participant_id,last_name,first_name,created_at";
     private static final String ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
     private static final Charset UTF8 = Charset.forName("UTF-8");
+    private static final Charset EXCEL = excelCharset();
     private static final Logger LOG = Logger.getLogger("org.unicog.numberrace.analytics");
 
     private final File file;
@@ -48,8 +54,9 @@ public final class ParticipantRegistry {
             return newCode(new ArrayList<String[]>());
         }
         for (String[] row : rows) {
-            if (row.length >= 3 && row[1].equals(last) && row[2].equals(first)) {
-                return row[0];
+            if (row.length >= 3 && row[1].trim().equals(last) && row[2].trim().equals(first)
+                    && row[0].trim().length() > 0) {
+                return row[0].trim();
             }
         }
         String code = newCode(rows);
@@ -70,7 +77,7 @@ public final class ParticipantRegistry {
             String code = sb.toString();
             boolean used = false;
             for (String[] row : rows) {
-                used |= row.length > 0 && row[0].equals(code);
+                used |= row.length > 0 && row[0].trim().equals(code);
             }
             if (!used) {
                 return code;
@@ -83,23 +90,64 @@ public final class ParticipantRegistry {
         if (!file.exists()) {
             return rows;
         }
-        BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file), UTF8));
-        try {
-            String line;
-            boolean header = true;
-            while ((line = in.readLine()) != null) {
+        byte[] bytes = readAll(file);
+        boolean header = true;
+        int start = 0;
+        for (int i = 0; i <= bytes.length; i++) {
+            if (i == bytes.length || bytes[i] == '\n') {
+                String line = decode(bytes, start, i - start);
+                start = i + 1;
                 if (header) {
                     header = false;
-                    continue;
-                }
-                if (line.trim().length() > 0) {
+                } else if (line.trim().length() > 0) {
                     rows.add(parse(line));
                 }
             }
+        }
+        return rows;
+    }
+
+    /**
+     * Uma linha do arquivo: em UTF-8 ou, se não for UTF-8 válido, em Windows-1252 (codificação do
+     * Excel em português ao salvar como CSV). A decisão é por linha porque, depois de uma edição no
+     * Excel, as linhas novas continuam sendo gravadas em UTF-8.
+     */
+    static String decode(byte[] bytes, int offset, int length) {
+        String line;
+        try {
+            line = UTF8.newDecoder().onMalformedInput(CodingErrorAction.REPORT)
+                    .onUnmappableCharacter(CodingErrorAction.REPORT)
+                    .decode(ByteBuffer.wrap(bytes, offset, length)).toString();
+        } catch (CharacterCodingException e) {
+            line = new String(bytes, offset, length, EXCEL);
+        }
+        if (line.startsWith("\uFEFF")) {
+            line = line.substring(1);
+        }
+        return line.endsWith("\r") ? line.substring(0, line.length() - 1) : line;
+    }
+
+    private static byte[] readAll(File f) throws IOException {
+        InputStream in = new FileInputStream(f);
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buf = new byte[8192];
+            int n;
+            while ((n = in.read(buf)) > 0) {
+                out.write(buf, 0, n);
+            }
+            return out.toByteArray();
         } finally {
             in.close();
         }
-        return rows;
+    }
+
+    private static Charset excelCharset() {
+        try {
+            return Charset.forName("windows-1252");
+        } catch (RuntimeException e) {
+            return Charset.forName("ISO-8859-1");
+        }
     }
 
     private void append(String code, String last, String first) throws IOException {
@@ -124,7 +172,9 @@ public final class ParticipantRegistry {
         return "\"" + s.replace("\"", "\"\"") + "\"";
     }
 
+    /** Separa os campos de uma linha, com vírgula ou, se não houver vírgula fora de aspas, ponto e vírgula. */
     static String[] parse(String line) {
+        char separator = separatorOf(line);
         List<String> fields = new ArrayList<String>();
         StringBuilder current = new StringBuilder();
         boolean inQuotes = false;
@@ -141,7 +191,7 @@ public final class ParticipantRegistry {
                 }
             } else if (c == '"') {
                 inQuotes = true;
-            } else if (c == ',') {
+            } else if (c == separator) {
                 fields.add(current.toString());
                 current.setLength(0);
             } else {
@@ -150,5 +200,21 @@ public final class ParticipantRegistry {
         }
         fields.add(current.toString());
         return fields.toArray(new String[fields.size()]);
+    }
+
+    private static char separatorOf(String line) {
+        boolean inQuotes = false;
+        boolean semicolon = false;
+        for (int i = 0; i < line.length(); i++) {
+            char c = line.charAt(i);
+            if (c == '"') {
+                inQuotes = !inQuotes;
+            } else if (!inQuotes && c == ',') {
+                return ',';
+            } else if (!inQuotes && c == ';') {
+                semicolon = true;
+            }
+        }
+        return semicolon ? ';' : ',';
     }
 }

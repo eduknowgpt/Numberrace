@@ -56,11 +56,45 @@ public class EventValidatorTest {
 
     @Test
     public void versaoMaisNovaToleraCamposETiposDesconhecidos() {
-        String nova = LINHA.replace("\"1.0\"", "\"1.1\"");
+        String nova = LINHA.replace("\"1.0\"", "\"1.2\"");
         assertEquals("[]", EventValidator.validateParsed(lido(nova.replace("{\"side\":\"left\"}",
                 "{\"side\":\"left\",\"x\":1}"))).toString());
         assertEquals("[]", EventValidator.validateParsed(lido(nova.replace("CLICK_IGNORED", "NOVO_TIPO"))).toString());
         assertTrue(EventValidator.validateParsed(lido(LINHA.replace("CLICK_IGNORED", "NOVO_TIPO")))
                 .toString().contains("event_type desconhecido"));
+    }
+
+    @Test
+    public void versao11ERigorosaEAceitaPausaPorFoco() {
+        String v11 = LINHA.replace("\"1.0\"", "\"1.1\"");
+        assertEquals("[]", EventValidator.validateParsed(lido(v11)).toString());
+        assertTrue(EventValidator.validateParsed(lido(v11.replace("{\"side\":\"left\"}", "{\"side\":\"left\",\"x\":1}")))
+                .toString().contains("campo não previsto"));
+        String pausa = "{\"schema_version\":\"1.1\",\"event_id\":\"0a1b2c3d-0000-4000-8000-000000000001\","
+                + "\"event_type\":\"PAUSE\",\"timestamp\":\"2026-10-11T10:00:00.000-03:00\","
+                + "\"session_id\":\"5fb5269a-ab53-4ee9-bf7a-f8489e351cf4\",\"participant_id\":\"P4WVSUY\","
+                + "\"sequence_number\":12,\"data\":{\"trigger\":\"window_focus\",\"screen\":\"choice\"}}";
+        assertEquals("[]", EventValidator.validateParsed(lido(pausa)).toString());
+        assertTrue(EventValidator.validateParsed(lido(pausa.replace("\"1.1\"", "\"1.0\"")))
+                .toString().contains("window_focus não existe na versão 1.0"));
+    }
+
+    @Test
+    public void partidaOuRodadaMenorQueUmEInvalida() {
+        // P10: o banco do pacote recusa esses valores; antes, um evento assim impedia o banco inteiro
+        assertTrue(EventValidator.validateParsed(lido(LINHA.replace("\"game_number\":1", "\"game_number\":0")))
+                .toString().contains("game_number menor que 1"));
+        assertTrue(EventValidator.validateParsed(lido(LINHA.replace("\"turn_number\":1", "\"turn_number\":-1")))
+                .toString().contains("turn_number menor que 1"));
+        assertTrue(EventValidator.validate(evento(EventType.CLICK_IGNORED, 0, 1, Json.obj("side", "left")))
+                .toString().contains("game_number menor que 1"));
+    }
+
+    @Test
+    public void campoDesconhecidoNoEnvelopeEInvalidoNasVersoesConhecidas() {
+        String extra = LINHA.replace("\"data\":", "\"computador\":\"sala 2\",\"data\":");
+        assertTrue(EventValidator.validateParsed(lido(extra)).toString().contains("campo não previsto no evento: computador"));
+        // numa versão 1.x mais nova, um campo novo no envelope é aceito (leitura tolerante)
+        assertEquals("[]", EventValidator.validateParsed(lido(extra.replace("\"1.0\"", "\"1.2\""))).toString());
     }
 }

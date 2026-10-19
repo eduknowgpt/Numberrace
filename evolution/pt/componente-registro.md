@@ -131,14 +131,18 @@ Cada evento é conferido pelo `EventValidator` antes de entrar na fila:
 
 - tipo, identificadores e data e hora presentes;
 - `participant_id` no formato do modelo (1 a 32 caracteres `A-Z`, `a-z`, `0-9`, `_`, `-`);
-- `sequence_number` maior ou igual a 1;
+- `sequence_number`, `game_number` e `turn_number` maiores ou iguais a 1;
 - contexto exigido pelo escopo: eventos de partida exigem `game_number` e `activity`; eventos de
   rodada exigem também `turn_number`;
 - campos obrigatórios de `data` presentes e nenhum campo não previsto para o tipo;
 - tempos (`_ms`) não negativos.
 
-As regras correspondem às do JSON Schema da Etapa 3, sem depender de uma biblioteca de validação
-no jogo (decisão D27). Um evento inválido é **descartado** e registrado no log do jogo, e **não
+São as regras de **estrutura** do JSON Schema da Etapa 3, sem depender de uma biblioteca de
+validação no jogo (decisão D27). O tipo e o valor de cada campo (por exemplo, `side` ser `left` ou
+`right`) não são conferidos durante o jogo: essa conformidade é verificada pelos testes
+automatizados, que conferem os eventos gravados contra o JSON Schema oficial (`SchemaConformanceTest`,
+acrescentado na validação complementar da Etapa 7; até então este texto dizia que as regras
+"correspondem" às do schema). Um evento inválido é **descartado** e registrado no log do jogo, e **não
 consome número de sequência**: assim, uma lacuna em `sequence_number` indica perda na gravação,
 e não um evento recusado.
 
@@ -258,7 +262,7 @@ o que está de acordo com a definição do evento (clique antes da liberação d
 | D24 | Integração com o jogo | Chamadas de uma linha a `GameEvents` nos pontos do jogo; apenas `GameEvents` conhece as classes do jogo | Desacoplamento com o mínimo de alterações no código legado; a refatoração do jogo (por exemplo, com observadores) fica fora do escopo |
 | D25 | Código do participante | `P` + 6 caracteres sorteados, guardado em `identification/participants.csv` e reutilizado pelo mesmo sobrenome e nome | Não revela nome, ordem de cadastro nem quantidade de participantes; não é calculado a partir do nome (modelo, seção 4); baixa chance de coincidência entre computadores. A equipe de pesquisa pode cadastrar outros códigos (por exemplo, `P017`) editando o arquivo |
 | D26 | Limites da sessão | Do cadastro ou seleção do aluno até a troca de aluno ou o fechamento do jogo | Corresponde ao uso do jogo por uma criança; o motivo do encerramento fica em `SESSION_END` |
-| D27 | Validação | Regras em código, equivalentes ao JSON Schema; evento inválido descartado sem consumir número de sequência | Sem nova dependência no jogo; lacunas na sequência passam a indicar apenas perdas na gravação |
+| D27 | Validação | Regras de estrutura em código (campos, contexto, numeração e tempos); o tipo e o valor de cada campo são conferidos contra o JSON Schema nos testes; evento inválido descartado sem consumir número de sequência | Sem nova dependência no jogo; lacunas na sequência passam a indicar apenas perdas na gravação |
 | D28 | Medição do tempo | Relógio monotônico do próprio componente | Não é afetado por ajustes do relógio do sistema; independente do `RT` do registro atual |
 | D29 | Cliques ignorados | Registrados por padrão, com opção de desligar | Atende à decisão D1 do catálogo (registro opcional) |
 | D30 | Geração de JSON | Código próprio (`Json`), sem biblioteca externa | A única dependência nova do jogo é o driver do SQLite |

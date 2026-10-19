@@ -14,14 +14,24 @@ import java.util.regex.Pattern;
 
 /**
  * Validação de um evento antes da gravação: campos obrigatórios da parte comum, contexto de
- * partida e rodada conforme o tipo, campos obrigatórios e permitidos da parte específica e
- * durações não negativas. A conformidade completa com o JSON Schema é verificada nos testes.
+ * partida e rodada conforme o tipo, números de sequência, partida e rodada a partir de 1, campos
+ * obrigatórios e permitidos da parte específica e durações não negativas. São regras de
+ * estrutura: o tipo e o valor de cada campo são conferidos contra o JSON Schema nos testes
+ * automatizados ({@code SchemaConformanceTest}).
  * Também valida eventos lidos de arquivos ({@link #validateParsed}), usados na exportação.
  */
 public final class EventValidator {
 
     private static final Pattern PARTICIPANT = Pattern.compile("[A-Za-z0-9_-]{1,32}");
     private static final Pattern UUID = Pattern.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");
+
+    /** Versões do modelo conhecidas por este programa (1.1 acrescentou {@code trigger = window_focus}). */
+    private static final Set<String> KNOWN_VERSIONS = new HashSet<String>(Arrays.asList("1.0", "1.1"));
+
+    /** Campos da parte comum (envelope) do modelo 1.0 e 1.1. */
+    private static final Set<String> ENVELOPE = new HashSet<String>(Arrays.asList("schema_version", "event_id",
+            "event_type", "timestamp", "session_id", "participant_id", "sequence_number", "activity", "game_number",
+            "turn_number", "data"));
 
     private static final Map<EventType, Set<String>> REQUIRED = new EnumMap<EventType, Set<String>>(EventType.class);
     private static final Map<EventType, Set<String>> OPTIONAL = new EnumMap<EventType, Set<String>>(EventType.class);
@@ -84,6 +94,12 @@ public final class EventValidator {
         if (e.getSequenceNumber() < 1) {
             problems.add("sequence_number menor que 1");
         }
+        if (e.getGameNumber() != null && e.getGameNumber().intValue() < 1) {
+            problems.add("game_number menor que 1");
+        }
+        if (e.getTurnNumber() != null && e.getTurnNumber().intValue() < 1) {
+            problems.add("turn_number menor que 1");
+        }
         EventType.Scope scope = e.getEventType().getScope();
         if (scope != EventType.Scope.SESSION && (e.getGameNumber() == null || e.getActivity() == null)) {
             problems.add(e.getEventType() + " exige game_number e activity");
@@ -118,8 +134,9 @@ public final class EventValidator {
 
     /**
      * Valida um evento lido de um arquivo JSON Lines (já convertido por {@link Json#parse}).
-     * Aceita qualquer versão 1.x do modelo. Na versão 1.0, tipos e campos desconhecidos são
-     * problemas; em versões 1.x mais novas, são aceitos (leitura tolerante, modelo seção 11).
+     * Aceita qualquer versão 1.x do modelo. Nas versões conhecidas (1.0 e 1.1), tipos e campos
+     * desconhecidos são problemas; em versões 1.x mais novas, são aceitos (leitura tolerante,
+     * modelo seção 11).
      */
     public static List<String> validateParsed(Map<String, Object> m) {
         List<String> problems = new ArrayList<String>();
@@ -128,7 +145,14 @@ public final class EventValidator {
             problems.add("schema_version ausente ou não suportada: " + version);
             return problems;
         }
-        boolean tolerant = !InteractionEvent.SCHEMA_VERSION.equals(version);
+        boolean tolerant = !KNOWN_VERSIONS.contains(version);
+        if (!tolerant) {
+            for (String key : m.keySet()) {
+                if (!ENVELOPE.contains(key)) {
+                    problems.add("campo não previsto no evento: " + key);
+                }
+            }
+        }
         String eventId = text(m, "event_id", problems);
         String sessionId = text(m, "session_id", problems);
         String participantId = text(m, "participant_id", problems);
@@ -175,6 +199,10 @@ public final class EventValidator {
         }
         @SuppressWarnings("unchecked")
         Map<String, Object> dataMap = (Map<String, Object>) data;
+        if ("1.0".equals(version) && (type == EventType.PAUSE || type == EventType.RESUME)
+                && "window_focus".equals(dataMap.get("trigger"))) {
+            problems.add("trigger window_focus não existe na versão 1.0 do modelo");
+        }
         InteractionEvent e = new InteractionEvent(eventId, type, time, sessionId, participantId,
                 sequence.intValue(), (String) activity, game, turn, dataMap);
         for (String problem : validate(e)) {
