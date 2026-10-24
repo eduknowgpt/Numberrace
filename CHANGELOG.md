@@ -34,6 +34,11 @@ are documented here.
   thousands of altered real events; regression tests with the sessions recorded by the real game
   (`src/test/resources/.../export/dados-reais/`); concurrency, round-trip (JSON and CSV) and
   robustness tests for unusual input files.
+- Technical guide of the interaction-data component (`evolution/pt/guia-tecnico-dados-interacao.md`):
+  architecture, code map, data layout, use by researchers and developers (with extension
+  recipes), test procedures, index of the technical decisions, consolidated limitations and
+  possible extensions. Package descriptions (`package-info.java`) for
+  `org.unicog.numberrace.analytics` and `org.unicog.numberrace.analytics.export`.
 
 ### Changed
 - Reorganized the legacy SVN directory structure.

@@ -411,7 +411,57 @@ Depois da conclusão da etapa, todo o trabalho entregue foi conferido de novo
 
 ---
 
-## 9. Andamento das etapas
+## 9. Etapa 8 — Documentação e consolidação (concluída em 24/10/2026)
+
+**Produto previsto no plano:** documentação técnica consolidada.
+**Produto:** [guia técnico do componente](guia-tecnico-dados-interacao.md), descrição dos pacotes no
+código (`package-info.java`) e este registro de trabalho atualizado.
+
+### 9.1 Atividades realizadas
+
+| Atividade do plano | O que foi feito |
+|---|---|
+| Documentação técnica do componente | Guia técnico com visão geral, arquitetura (diagrama), mapa do código, uso pelo pesquisador e pelo desenvolvedor, com receitas de extensão; descrição dos dois pacotes no próprio código |
+| Documentação do modelo de dados | Estrutura dos dados reunida no guia (pastas no computador, formato do evento, pacote de exportação e tabelas), com referência ao modelo, ao JSON Schema e ao dicionário de dados |
+| Documentação dos testes | Procedimentos de teste reunidos no guia: comandos, tipos de teste e os 100 testes automatizados por classe |
+| Registro das decisões e limitações | Índice único das decisões; lista única das limitações, com a situação de cada uma; possibilidades de evolução organizadas conforme a seção 13 do plano |
+| Apresentação dos resultados à equipe | A agendar com o orientador |
+
+### 9.2 Principais resultados
+
+- Os dez assuntos pedidos pelo plano para a documentação final estão reunidos no guia técnico:
+
+| Assunto pedido no plano | Seção do guia técnico | Detalhe |
+|---|---|---|
+| Arquitetura do componente | 2 e 3 | `componente-registro.md`, `exportacao-dados.md` |
+| Modelo de eventos | 1 e 4 | `modelo-eventos.md` e JSON Schema |
+| Estrutura dos dados | 4 | `persistencia-eventos.md`, `exportacao-dados.md` |
+| Estratégia de persistência | 2 e 4 | `persistencia-eventos.md` |
+| Mecanismo de exportação | 2, 4 e 5 | `exportacao-dados.md` |
+| Instruções de utilização | 5 e 6 | — |
+| Procedimentos de teste | 7 | `validacao-registros.md` |
+| Decisões técnicas | 8 | Documento de cada etapa |
+| Limitações | 9 | Documento de cada etapa |
+| Possibilidades de evolução | 10 | — |
+
+- A consolidação mostrou que nenhuma decisão foi substituída. Cinco limitações e observações
+  registradas nas Etapas 4 e 5 foram resolvidas nas etapas seguintes; as que continuam em aberto estão listadas,
+  com a consequência de cada uma, na seção 9 do guia.
+- Foram acrescentadas receitas para as extensões mais prováveis: novo tipo de evento, novo campo,
+  nova coluna ou formato de exportação, nova regra de integridade e mudança na estrutura do banco.
+- O código do componente não teve mudança de comportamento: apenas a descrição dos dois pacotes.
+  Os 100 testes continuam aprovados.
+- **Teste da documentação no Windows:** As seções 1 e 5 do guia foram seguidas como faria um usuário novo: jogar, encontrar os dados, exportar, abrir no Excel, ler os relatórios e exportar um único participante. O teste mostrou três pontos em que o texto supunha conhecimento prévio (como abrir uma pasta indicada por `%USERPROFILE%`, onde ficam os relatórios do pacote e como informar opções ao exportador no Eclipse), e a seção 5 foi reescrita com passo a passo. O teste levou de 20 a 30 minutos, e os 100 testes automatizados também foram aprovados no Windows, pelo Eclipse.
+
+### 9.3 Decisões
+
+| # | Decisão | Escolha | Justificativa |
+|---|---|---|---|
+| D50 | Forma da documentação consolidada | Um guia técnico de entrada, que reúne o essencial e aponta para os documentos de cada etapa, mantidos sem alteração | Os documentos das etapas registram o raciocínio de cada momento e já foram apresentados nos Pull Requests; um guia de entrada evita duplicar o conteúdo e indica a quem chega por onde começar |
+
+---
+
+## 10. Andamento das etapas
 
 | Etapa | Descrição | Situação |
 |---|---|---|
@@ -422,10 +472,50 @@ Depois da conclusão da etapa, todo o trabalho entregue foi conferido de novo
 | 5 | Desenvolvimento do componente de registro | Concluída |
 | 6 | Exportação e disponibilização dos dados | Concluída |
 | 7 | Testes, validação e integridade dos registros | Concluída |
-| 8 | Documentação e consolidação | Próxima |
+| 8 | Documentação e consolidação | Concluída (apresentação à equipe a agendar) |
 
-As Etapas 1 e 2 foram incorporadas a este repositório pelo Pull Request #1 (01/10/2026). A partir
-da Etapa 3, cada etapa é apresentada em um Pull Request próprio.
+As Etapas 1 e 2 foram incorporadas a este repositório pelo Pull Request #1 (01/10/2026), as Etapas
+3 a 5 pelos Pull Requests #2 a #4 (17/10/2026) e as Etapas 6 e 7 pelos Pull Requests #5 e #6
+(19/10/2026). A Etapa 8 é apresentada no Pull Request #8. Uma correção encontrada durante os testes,
+fora do componente de registro (estalo no início de cada som), foi apresentada à parte, no Pull
+Request #7, incorporado em 17/10/2026.
+
+---
+
+## 11. Considerações finais
+
+O projeto partiu da questão: como estruturar e implementar o registro das interações realizadas
+durante as sessões do Number Race, de modo a preservar os dados produzidos pelo jogo, permitir a
+sua exportação e possibilitar análises posteriores? A resposta construída nas oito etapas foi:
+
+- **estruturar** as interações como eventos com uma parte comum estável e uma parte específica por
+  tipo, descritos num modelo versionado e num JSON Schema (Etapas 2 e 3);
+- **preservar** os eventos num arquivo de texto por sessão, gravado a cada evento e acompanhado de
+  uma cópia em banco de dados, sem depender de internet e sem interromper o jogo (Etapas 4 e 5);
+- **exportar** os dados de um ou mais computadores num pacote com o dado bruto, tabelas prontas
+  para planilhas e ferramentas de análise, dicionário de dados e conferência de integridade
+  (Etapas 6 e 7);
+- **documentar** o componente para que outros estudantes e pesquisadores possam usá-lo e
+  continuá-lo (Etapa 8).
+
+Produtos finais previstos no plano e onde estão:
+
+| Produto | Local |
+|---|---|
+| Catálogo de eventos de interação | [`catalogo-eventos.md`](catalogo-eventos.md) |
+| Modelo estruturado dos eventos | [`modelo-eventos.md`](modelo-eventos.md) e [`modelo-eventos.schema.json`](modelo-eventos.schema.json) |
+| Especificação dos dados registrados | [`modelo-eventos.md`](modelo-eventos.md) e dicionário de dados de cada pacote de exportação |
+| Especificação da estratégia de persistência | [`persistencia-eventos.md`](persistencia-eventos.md) |
+| Componente de registro de eventos integrado ao software | Pacote `org.unicog.numberrace.analytics` ([`componente-registro.md`](componente-registro.md)) |
+| Mecanismo de exportação dos dados | Pacote `org.unicog.numberrace.analytics.export` ([`exportacao-dados.md`](exportacao-dados.md)) |
+| Conjunto de testes técnicos | 100 testes automatizados em `numberrace-core/src/test/java/org/unicog/numberrace/analytics/` |
+| Relatório de validação dos registros | [`validacao-registros.md`](validacao-registros.md) |
+| Documentação técnica do componente | [`guia-tecnico-dados-interacao.md`](guia-tecnico-dados-interacao.md) |
+| Relatório final | Formato de entrega a definir com o orientador; o conteúdo está reunido neste registro e no guia técnico |
+
+Todos os testes foram feitos com dados simulados. O uso do componente em pesquisas com crianças
+depende dos procedimentos institucionais e éticos previstos no projeto principal. As
+possibilidades de continuidade estão na seção 10 do guia técnico.
 
 ---
 
