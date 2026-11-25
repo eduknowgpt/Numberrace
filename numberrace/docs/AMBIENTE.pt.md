@@ -38,12 +38,10 @@ Clonar o repositório (ou um fork) e usar a pasta interna `numberrace/`, onde es
 
 ### 4. Compilar
 
-Botão direito no projeto `numberrace` → **Run As → Maven build…** → *Goals*: `clean package` →
+Botão direito no projeto `numberrace` → **Run As → Maven build…** → *Goals*: `clean install` →
 **Run**. Resultado esperado: `BUILD SUCCESS`.
 
-Durante o `package`, cada pacote de idioma é copiado para
-`numberrace-core/target/classes/langs/`. É ali que o jogo procura os idiomas quando é
-executado pelo Eclipse.
+Na configuração revisada, os idiomas são dependências Maven de runtime do Core. Não há cópia para target/classes/langs. Os ambientes registrados acima referem-se à versão anterior; a revisão precisa ser validada.
 
 Depois do build, atualizar o projeto no Eclipse (**F5**).
 

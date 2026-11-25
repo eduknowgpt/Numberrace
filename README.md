@@ -118,95 +118,30 @@ These fixes allow localized WAV audio and the original shared OGG resources to c
 
 Availability and completeness of individual text and audio resources may vary among language packs inherited from the original project.
 
-## Building
+## Building / Desenvolvimento no Eclipse
 
-### Requirements
+Requisitos: Git, Eclipse IDE for Java Developers com m2e e JDK 21 (recomendado para a equipe; o código mantém compatibilidade de compilação Java 8). Maven 3.9.x para uso fora do Eclipse. A primeira construção exige acesso ao Maven Central.
 
-To build the project, you need:
+1. Clone o repositório em qualquer pasta. Não use caminhos absolutos no projeto.
+2. No Eclipse, configure o JDK em Window > Preferences > Java > Installed JREs.
+3. File > Import > Maven > Existing Maven Projects. Selecione a subpasta `numberrace` do clone (a que contém o POM pai). Importe os 13 projetos padrão; não importe o editor Scala opcional.
+4. No projeto `numberrace`, execute Run As > Maven build... com Goals `clean install` (ou use `NumberRace - Build.launch`). Não marque Skip Tests. Aguarde BUILD SUCCESS.
+5. Selecione os projetos e execute Maven > Update Project (Alt+F5). Mantenha a resolução de dependências do workspace habilitada para execução Java.
+6. Execute `NumberRace - Run.launch` (Run As > Java Application, ou abra `org.unicog.numberrace.Game` no Core e execute). Para depurar, use Debug As > Java Application.
 
-- a Java Development Kit (JDK);
-- Apache Maven;
-- Git, when cloning the repository;
-- Eclipse IDE with Maven/M2E support, optionally.
-
-The Number Race is a legacy Java application and still depends on older libraries. Until modernization establishes a formally supported Java baseline, use a JDK version known to work with the current project and document newly validated environments.
-
-### Clone the Repository
+Alternativa de terminal, a partir da pasta clonada:
 
 ```bash
-git clone <repository-url>
-cd <repository-directory>
+mvn -f numberrace/pom.xml clean install
 ```
 
-Replace the placeholders with the actual repository URL and directory name.
+Os nove idiomas são dependências de runtime do Core. O Eclipse usa os projetos importados; o Maven usa os artefatos do reactor. Não é necessário copiar JARs para `target/classes/langs` ou para a pasta pessoal. Pacotes externos continuam disponíveis para idiomas não fornecidos pelo build. Os pacotes atuais têm prioridade. O Console informa a origem dos idiomas.
 
-### Build with Maven
+Os dados pessoais e de pesquisa continuam fora do Git, no diretório de aplicação do usuário (por padrão `~/NumberRace/v3`). Não apague esse diretório para atualizar o código.
 
-From the repository root:
+O perfil opcional `deploy-local` continua disponível para instalar JARs de idioma para aplicações legadas. Não é necessário para desenvolvimento.
 
-```bash
-mvn clean package
-```
-
-The root POM acts as a Maven reactor and builds the application modules and language packs in the required order.
-
-A successful build should finish with:
-
-```
-BUILD SUCCESS
-```
-
-Generated artifacts are written to the corresponding `target/` directories. These directories are build output and should **not** be committed to Git.
-
-### Language-Pack Deployment
-
-Language packs are generated as JAR files during the Maven build.
-
-During development, ensure that the application is actually loading the newly generated language pack. An older installed JAR may otherwise take precedence over recently modified resources.
-
-The application may use an external language directory such as:
-
-```
-${user.home}/NumberRace/v3/langs/
-```
-
-When diagnosing localization issues, verify both the newly generated language-pack JAR and the JAR actually loaded by the running application.
-
-If the current POM provides the `deploy-local` profile, local deployment can be performed with:
-
-```bash
-mvn package -Pdeploy-local
-```
-
-## Importing into Eclipse
-
-The recommended Eclipse workflow uses Maven/M2E:
-
-1. Open **File → Import**.
-2. Select **Maven → Existing Maven Projects**.
-3. Select the repository root directory.
-4. Import the root project and detected Maven modules.
-5. Run **Maven → Update Project**.
-6. If necessary, enable **Force Update of Snapshots/Releases**.
-
-To perform a complete build inside Eclipse:
-
-1. Right-click the root Maven project.
-2. Select **Run As → Maven build...**
-3. Enter `clean package`.
-4. Run the build and confirm `BUILD SUCCESS`.
-
-## Running from Eclipse
-
-After a successful build, locate the main application class in `numberrace-core`:
-
-```
-org.unicog.numberrace.Game
-```
-
-Right-click `Game.java` and select **Run As → Java Application**.
-
-If the game starts but a localized resource is missing or outdated, first verify which language-pack JAR is being loaded at runtime.
+As três bibliotecas legadas são versionadas em `numberrace/legacy-maven-repository`; não copie bibliotecas para o repositório Maven pessoal manualmente. Não versione `target`, `.project`, `.classpath` ou `.settings`.
 
 ## Working with Language Packs
 
@@ -235,7 +170,7 @@ Do not edit generated files under `target/`, because Maven replaces them on subs
 A new language should follow the existing language-pack architecture:
 
 1. create a module under `languages/<locale>`;
-2. add it to the `languages` Maven aggregator;
+2. add it to the `languages` Maven aggregator and the Core runtime dependencies; add a unique marker and register the code in `GamePreferences`;
 3. provide the corresponding message bundle and localized resources;
 4. package the language as a JAR;
 5. test textual localization, resource lookup, and audio independently.
@@ -279,7 +214,7 @@ A modernization change should preserve observable game behavior unless the chang
 
 ### A localized change does not appear
 
-The application may be loading an older language-pack JAR from its external language directory. Check the runtime language-pack location, rebuild the language module, and redeploy the updated JAR.
+Check the Console for the marker URL, enable workspace dependency resolution, and run the full Maven build. The current classpath packs take priority over external packs.
 
 ### A localized sound is not played
 

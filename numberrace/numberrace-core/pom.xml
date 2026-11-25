@@ -20,7 +20,16 @@
     </plugins>
   </build>
   <dependencies>
-    <dependency><groupId>fi.nmi.numberrace</groupId><artifactId>numberrace-res</artifactId><version>3.0.0</version></dependency>
+    <dependency><groupId>org.unicog.numberrace</groupId><artifactId>numberrace-langs_de</artifactId><version>0.0.1.notext</version><scope>runtime</scope></dependency>
+    <dependency><groupId>org.unicog.numberrace</groupId><artifactId>numberrace-langs_el</artifactId><version>0.0.1.notext</version><scope>runtime</scope></dependency>
+    <dependency><groupId>org.unicog.numberrace</groupId><artifactId>numberrace-langs_en</artifactId><version>0.0.1.notext</version><scope>runtime</scope></dependency>
+    <dependency><groupId>org.unicog.numberrace</groupId><artifactId>numberrace-langs_es</artifactId><version>0.0.1.notext</version><scope>runtime</scope></dependency>
+    <dependency><groupId>org.unicog.numberrace</groupId><artifactId>numberrace-langs_fi</artifactId><version>3.0-SNAPSHOT</version><scope>runtime</scope></dependency>
+    <dependency><groupId>org.unicog.numberrace</groupId><artifactId>numberrace-langs_fr</artifactId><version>0.0.1.notext</version><scope>runtime</scope></dependency>
+    <dependency><groupId>org.unicog.numberrace</groupId><artifactId>numberrace-langs_nl</artifactId><version>0.0.1.notext</version><scope>runtime</scope></dependency>
+    <dependency><groupId>org.unicog.numberrace</groupId><artifactId>numberrace-langs_pt</artifactId><version>0.0.1.notext</version><scope>runtime</scope></dependency>
+    <dependency><groupId>org.unicog.numberrace</groupId><artifactId>numberrace-langs_sv</artifactId><version>1.0.1</version><scope>runtime</scope></dependency>
+    <dependency><groupId>fi.nmi.numberrace</groupId><artifactId>numberrace-res</artifactId></dependency>
     <dependency><groupId>fi.nmi</groupId><artifactId>jmat</artifactId><version>5.0-nmi</version></dependency>
     <dependency><groupId>com.threerings</groupId><artifactId>nenya-media</artifactId><version>rev407</version></dependency>
     <dependency><groupId>fi.nmi</groupId><artifactId>samskivert</artifactId><version>2272.1</version></dependency>

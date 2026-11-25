@@ -135,7 +135,7 @@ public class GamePreferences {
                                 .toURI();
 
             if ("file".equals(uri.getScheme())) {
-                File corePath = new File(uri.getSchemeSpecificPart());
+                File corePath = new File(uri);
                 if (!corePath.isDirectory()) {
                     corePath = corePath.getParentFile();
                 }
@@ -238,8 +238,18 @@ public class GamePreferences {
             localesTable.put(locale2use, null);
         }
 
-        addLanguages(localesTable, GamePreferences.getGlobalLangDir());
+        // External packs remain available for languages not supplied by the build.
         addLanguages(localesTable, GamePreferences.getLangDir());
+        addLanguages(localesTable, GamePreferences.getGlobalLangDir());
+        // Maven runtime dependencies (including Eclipse workspace projects) win.
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        for (String code : new String[] { "de", "el", "en", "es", "fi", "fr", "nl", "pt", "sv" }) {
+            URL marker = loader.getResource("META-INF/numberrace/languages/" + code + ".marker");
+            if (marker != null) {
+                localesTable.put(new Locale(code), null);
+                log.info("Language pack " + code + " from " + marker);
+            }
+        }
 
         // screen for choosing language
         if (!localesTable.isEmpty()) {
