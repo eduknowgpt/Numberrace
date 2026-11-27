@@ -1,0 +1,1 @@
+Requer V5. Substitua GameObject.java (compare antes se houve alterações locais). No messages_pt.properties existente, altere somente LangVars.MENU_TITLE=Jogo pausado. Mantém ações e registros originais; não acrescenta confirmação de saída. Teste ESC, retorno, troca de jogador e saída.

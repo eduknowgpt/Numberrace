@@ -907,97 +907,67 @@ public class GameObject extends NumCompListener {
     }
 
     private Component getMainMenu() {
-        JPanel mnu = new JPanel() {
-            private final String versionStr = GamePreferences.getVersionStr();
-
-            @Override
-            protected void paintComponent(Graphics g) {
+        JPanel menu = new JPanel(new java.awt.GridBagLayout()) {
+            private final org.unicog.numberrace.ui.GameBackground art =
+                    new org.unicog.numberrace.ui.GameBackground();
+            @Override protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                g.drawString(versionStr,
-                             3,
-                             i(GraphicsVariables.DISPLAY_HEIGHT - 3));
+                art.paint(g, getWidth(), getHeight());
+                g.setColor(org.unicog.numberrace.ui.GameTheme.INK);
+                g.drawString(GamePreferences.getVersionStr(), 6, getHeight() - 6);
             }
         };
+        org.unicog.numberrace.ui.GamePanel card = new org.unicog.numberrace.ui.GamePanel();
+        card.setLayout(new BorderLayout(0, i(12)));
+        card.setBorder(javax.swing.BorderFactory.createEmptyBorder(i(16), i(22), i(22), i(22)));
+        org.unicog.numberrace.ui.GameHeader header = new org.unicog.numberrace.ui.GameHeader();
+        JLabel title = new JLabel(Messages.getString("LangVars.MENU_TITLE"), JLabel.CENTER);
+        title.setFont(new Font("SansSerif", Font.BOLD, i(26)));
+        title.setForeground(Color.WHITE);
+        header.add(title, BorderLayout.CENTER);
+        card.add(header, BorderLayout.NORTH);
 
-        //        panel.setOpaque(false);
-
-        mnu.setBackground(new Color(0, 255, 255)); //light blue)
-        mnu.setLayout(new BoxLayout(mnu, BoxLayout.Y_AXIS));
-        JLabel titleLabel = new JLabel(
-                Messages.getString("LangVars.MENU_TITLE"));
-        titleLabel.setFont(new Font("Arial Black", Font.BOLD, i(24))); //$NON-NLS-1$
-        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel explnLabel = new JLabel(
-                Messages.getString("LangVars.MENU_SELECT_OPTION"));
-        explnLabel.setFont(new Font("Arial", Font.ITALIC, i(20))); //$NON-NLS-1$
-        explnLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JButton exitSessionButton = new JButton(new AbstractAction() {
-
+        JPanel options = new JPanel(new java.awt.GridLayout(3, 1, 0, i(10)));
+        options.setOpaque(false);
+        JButton resume = new JButton(getMenuAction());
+        resume.setText(Messages.getString("LangVars.MENU_RETURN"));
+        styleMenuButton(resume, new Color(255, 207, 48), new Color(81, 54, 0), "play");
+        options.add(resume);
+        JButton change = new JButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 GameEvents.sessionEnded("change_student", getScreenState());
                 getDataFileHandler().exitStudent();
                 getNumCompManager().endGame();
             }
-
         });
-        exitSessionButton.setFont(new Font("Arial", Font.PLAIN, i(20))); //$NON-NLS-1$
-        exitSessionButton.setBackground(Color.YELLOW);
-        exitSessionButton.setForeground(Color.BLACK);
-        exitSessionButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        exitSessionButton.setText(Messages.getString("LangVars.MENU_CHANGE_STUDENT"));
+        change.setText(Messages.getString("LangVars.MENU_CHANGE_STUDENT"));
+        styleMenuButton(change, new Color(32, 104, 175), Color.WHITE, "edit");
+        options.add(change);
+        JButton quit = new JButton(getEndAction());
+        quit.setText(Messages.getString("LangVars.MENU_QUIT"));
+        styleMenuButton(quit, new Color(180, 35, 24), Color.WHITE, "exit");
+        options.add(quit);
+        card.add(options, BorderLayout.CENTER);
+        java.awt.GridBagConstraints gbcMenuCard = new java.awt.GridBagConstraints();
+        menu.add(card, gbcMenuCard);
+        return menu;
+    }
 
-        JButton exitProgramButton = new JButton(getEndAction());
-        exitProgramButton.setFont(new Font("Arial", Font.PLAIN, i(20))); //$NON-NLS-1$
-        exitProgramButton.setBackground(Color.YELLOW);
-        exitProgramButton.setForeground(Color.BLACK);
-        exitProgramButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        exitProgramButton.setText(Messages.getString("LangVars.MENU_QUIT"));
-
-        JButton returnToGameButton = new JButton(getMenuAction());
-        returnToGameButton.setFont(new Font("Arial", Font.PLAIN, i(20))); //$NON-NLS-1$
-        returnToGameButton.setBackground(Color.YELLOW);
-        returnToGameButton.setForeground(Color.BLACK);
-        returnToGameButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        returnToGameButton.setText(Messages.getString("LangVars.MENU_RETURN"));
-
-        Dimension ps1 = exitSessionButton.getPreferredSize();
-        Dimension ps2 = exitSessionButton.getPreferredSize();
-        Dimension ps3 = returnToGameButton.getPreferredSize();
-
-        ps1.setSize(Math.max(ps1.width, ps2.width),
-                    Math.max(ps1.height, ps2.height));
-        ps1.setSize(Math.max(ps1.width, ps3.width),
-                    Math.max(ps1.height, ps3.height));
-
-        mnu.add(Box.createGlue());
-        mnu.add(titleLabel);
-        mnu.add(explnLabel);
-        mnu.add(Box.createGlue());
-        mnu.add(exitSessionButton);
-        mnu.add(Box.createGlue());
-        mnu.add(exitProgramButton);
-        mnu.add(Box.createGlue());
-        mnu.add(returnToGameButton);
-        mnu.add(Box.createGlue());
-
-        exitSessionButton.setSize(ps1);
-        exitProgramButton.setSize(ps1);
-        returnToGameButton.setSize(ps1);
-
-        mnu.setMaximumSize(display.getActualResolution());
-        mnu.setMinimumSize(display.getActualResolution());
-        mnu.setPreferredSize(display.getActualResolution());
-        mnu.setSize(display.getActualResolution());
-
-        JPanel p = new JPanel();
-        p.setBackground(Color.BLACK);
-        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        p.add(Box.createGlue());
-        p.add(mnu);
-        p.add(Box.createGlue());
-        return p;
+    private void styleMenuButton(JButton button, Color background, Color foreground, String icon) {
+        button.setFont(new Font("SansSerif", Font.BOLD, i(20)));
+        button.setBackground(background);
+        button.setForeground(foreground);
+        button.setUI(new org.unicog.numberrace.ui.GameButton());
+        button.setOpaque(false);
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        button.setRolloverEnabled(true);
+        button.setIcon(new org.unicog.numberrace.ui.GameIcon(icon, i(22)));
+        button.setIconTextGap(i(10));
+        button.setBorder(javax.swing.BorderFactory.createEmptyBorder(i(8), i(16), i(12), i(16)));
+        Dimension natural = button.getPreferredSize();
+        button.setPreferredSize(new Dimension(Math.max(i(300), natural.width), Math.max(i(52), natural.height)));
     }
 
     public SoundManager getSoundManager() {
