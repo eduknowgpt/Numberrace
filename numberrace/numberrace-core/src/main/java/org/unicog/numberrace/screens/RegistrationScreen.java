@@ -70,7 +70,7 @@ public class RegistrationScreen extends JPanel implements
             false, false, false };
 
     // Graphics
-    public final Color DEFAULT_SCREEN_COLOR = new Color(0, 255, 255); // light blue
+    public final Color DEFAULT_SCREEN_COLOR = new Color(239, 246, 252); // light blue
     public final Color BUTTON_COLOR = new Color(135, 254, 154); // yellow
     public final Color BUTTON_TEXT_COLOR = Color.BLACK;
 
@@ -128,238 +128,167 @@ public class RegistrationScreen extends JPanel implements
      * This method initializes this
      * 
      */
-    private void initialize() {
+    private final java.awt.CardLayout cards = new java.awt.CardLayout();
+    private JPanel pages;
+    private static final Color INK = new Color(23, 62, 105);
+    private static final Color GREEN = new Color(35, 123, 70);
 
-        GridBagConstraints gbcTFStartLevel = new GridBagConstraints();
-        gbcTFStartLevel.gridx = 3;
-        gbcTFStartLevel.gridy = 7;
-        gbcTFStartLevel.fill = GridBagConstraints.HORIZONTAL;
-        gbcTFStartLevel.gridwidth = 1;
-        gbcTFStartLevel.insets = translateInsets(new Insets(5, 5, 5, 0));
-        gbcTFStartLevel.weighty = 1.0;
-        gbcTFStartLevel.anchor = GridBagConstraints.NORTHEAST;
+    private final ImageIcon carArt = loadArt("car.png");
+    private final ImageIcon flagArt = loadArt("flag.png");
 
-        GridBagConstraints gbcTFSex = new GridBagConstraints();
-        gbcTFSex.gridy = 6;
-        gbcTFSex.gridx = 3;
-        gbcTFSex.fill = GridBagConstraints.HORIZONTAL;
-        gbcTFSex.gridwidth = 2;
-        gbcTFSex.insets = translateInsets(new Insets(5, 5, 5, 75));
-        // gbcTFSex.weightx = 0.5;
-        gbcTFSex.weighty = 1.0;
-        gbcTFSex.anchor = GridBagConstraints.WEST;
-
-        GridBagConstraints gbcTFClass = new GridBagConstraints();
-        gbcTFClass.gridy = 5;
-        gbcTFClass.gridx = 3;
-        gbcTFClass.fill = GridBagConstraints.HORIZONTAL;
-        gbcTFClass.gridwidth = 2;
-        gbcTFClass.insets = translateInsets(new Insets(5, 5, 5, 75));
-        // gbcTFClass.weightx = 0.5;
-        gbcTFClass.weighty = 1.0;
-        gbcTFClass.anchor = GridBagConstraints.WEST;
-
-        GridBagConstraints gbcTFAge = new GridBagConstraints();
-        gbcTFAge.gridy = 4;
-        gbcTFAge.gridx = 3;
-        gbcTFAge.fill = GridBagConstraints.HORIZONTAL;
-        gbcTFAge.gridwidth = 2;
-        gbcTFAge.insets = translateInsets(new Insets(5, 5, 5, 75));
-        // gbcTFAge.weightx = 0.5;
-        gbcTFAge.weighty = 1.0;
-        gbcTFAge.anchor = GridBagConstraints.WEST;
-
-        GridBagConstraints gbcTFFirstName = new GridBagConstraints();
-        gbcTFFirstName.gridy = 3;
-        gbcTFFirstName.gridx = 3;
-        gbcTFFirstName.fill = GridBagConstraints.HORIZONTAL;
-        gbcTFFirstName.gridwidth = 2;
-        gbcTFFirstName.insets = translateInsets(new Insets(5, 5, 5, 75));
-        // gbcTFFirstName.weightx = 0.5;
-        gbcTFFirstName.weighty = 1.0;
-        gbcTFFirstName.anchor = GridBagConstraints.WEST;
-
-        GridBagConstraints gbcTFLastName = new GridBagConstraints();
-        gbcTFLastName.anchor = GridBagConstraints.WEST;
-        gbcTFLastName.gridy = 2;
-        gbcTFLastName.gridx = 3;
-        gbcTFLastName.fill = GridBagConstraints.HORIZONTAL;
-        gbcTFLastName.gridwidth = 2;
-        gbcTFLastName.insets = translateInsets(new Insets(5, 5, 5, 75));
-        // gbcTFLastName.weightx = 0.5;
-        gbcTFLastName.weighty = 1.0;
-        gbcTFLastName.anchor = GridBagConstraints.WEST;
-
-        GridBagConstraints gbcConfirmBtn = new GridBagConstraints();
-        gbcConfirmBtn.fill = GridBagConstraints.BOTH;
-        gbcConfirmBtn.gridx = 2;
-        gbcConfirmBtn.gridy = 8;
-        gbcConfirmBtn.gridwidth = 1;
-        gbcConfirmBtn.insets = translateInsets(new Insets(15, 0, 10, 25));
-        gbcConfirmBtn.weightx = 1.0;
-        gbcConfirmBtn.weighty = 1.0;
-
-        GridBagConstraints gbcCancelBtn = new GridBagConstraints();
-        gbcCancelBtn.fill = GridBagConstraints.BOTH;
-        gbcCancelBtn.gridx = 3;
-        gbcCancelBtn.gridy = 8;
-        gbcCancelBtn.insets = translateInsets(new Insets(15, 0, 10, 25));
-        gbcCancelBtn.weightx = 1.0;
-        gbcCancelBtn.weighty = 1.0;
-
-        GridBagConstraints gbcDeleteBtn = new GridBagConstraints();
-        gbcDeleteBtn.fill = GridBagConstraints.BOTH;
-        gbcDeleteBtn.gridx = 4;
-        gbcDeleteBtn.gridy = 8;
-        gbcDeleteBtn.insets = translateInsets(new Insets(15, 0, 10, 75));
-        gbcDeleteBtn.weightx = 1.0;
-        gbcDeleteBtn.weighty = 1.0;
-
-        GridBagConstraints gbcSessionsPlayedLabel = new GridBagConstraints();
-        gbcSessionsPlayedLabel.gridx = 0;
-        gbcSessionsPlayedLabel.gridy = 9;
-        gbcSessionsPlayedLabel.anchor = GridBagConstraints.NORTHWEST;
-        gbcSessionsPlayedLabel.gridwidth = 2;
-        gbcSessionsPlayedLabel.insets = translateInsets(new Insets(0, 75, 0, 75));
-        // gbcLastSessionLabel.weightx = 1.0;
-        gbcSessionsPlayedLabel.weighty = 1.0;
-        gbcSessionsPlayedLabel.fill = GridBagConstraints.HORIZONTAL;
-
-        GridBagConstraints gbcStartLevelLabel = new GridBagConstraints();
-        gbcStartLevelLabel.gridx = 2;
-        gbcStartLevelLabel.gridy = 7;
-        gbcStartLevelLabel.anchor = GridBagConstraints.NORTHWEST;
-        gbcStartLevelLabel.insets = translateInsets(new Insets(10, 0, 0, 0));
-        gbcStartLevelLabel.weighty = 1.0;
-
-        GridBagConstraints gbcSexLabel = new GridBagConstraints();
-        gbcSexLabel.gridx = 2;
-        gbcSexLabel.gridy = 6;
-        gbcSexLabel.anchor = GridBagConstraints.WEST;
-        // gbcSexLabel.weightx = 1.0;
-        gbcSexLabel.weighty = 1.0;
-
-        GridBagConstraints gbcClassLabel = new GridBagConstraints();
-        gbcClassLabel.gridx = 2;
-        gbcClassLabel.gridy = 5;
-        gbcClassLabel.anchor = GridBagConstraints.WEST;
-        // gbcClassLabel.weightx = 1.0;
-        gbcClassLabel.weighty = 1.0;
-
-        GridBagConstraints gbcAgeLabel = new GridBagConstraints();
-        gbcAgeLabel.gridx = 2;
-        gbcAgeLabel.gridy = 4;
-        gbcAgeLabel.anchor = GridBagConstraints.WEST;
-        // gbcAgeLabel.weightx = 1.0;
-        gbcAgeLabel.weighty = 1.0;
-
-        GridBagConstraints gbcFirstNameLabel = new GridBagConstraints();
-        gbcFirstNameLabel.gridx = 2;
-        gbcFirstNameLabel.gridy = 3;
-        gbcFirstNameLabel.anchor = GridBagConstraints.WEST;
-        // gbcFirstNameLabel.weightx = 1.0;
-        gbcFirstNameLabel.weighty = 1.0;
-
-        GridBagConstraints gbcLastNameLabel = new GridBagConstraints();
-        gbcLastNameLabel.gridx = 2;
-        gbcLastNameLabel.gridy = 2;
-        gbcLastNameLabel.anchor = GridBagConstraints.WEST;
-        // gbcLastNameLabel.weightx = 1.0;
-        gbcLastNameLabel.weighty = 1.0;
-
-        GridBagConstraints gbcNewStudentBtn = new GridBagConstraints();
-        gbcNewStudentBtn.gridx = 0;
-        gbcNewStudentBtn.gridy = 10;
-        gbcNewStudentBtn.fill = GridBagConstraints.BOTH;
-        gbcNewStudentBtn.insets = translateInsets(new Insets(15, 75, 10, 10));
-        // gbcNewStudentBtn.weightx = 1.0;
-        gbcNewStudentBtn.weighty = 1.0;
-
-        GridBagConstraints gbcModifyBtn = new GridBagConstraints();
-        gbcModifyBtn.gridx = 1;
-        gbcModifyBtn.gridy = 10;
-        gbcModifyBtn.insets = translateInsets(new Insets(15, 10, 10, 50));
-        gbcModifyBtn.fill = GridBagConstraints.BOTH;
-        gbcModifyBtn.weightx = 1.0;
-        gbcModifyBtn.weighty = 1.0;
-
-        GridBagConstraints gbcStartBtn = new GridBagConstraints();
-        gbcStartBtn.gridx = 3;
-        gbcStartBtn.gridy = 9;
-        gbcStartBtn.gridwidth = 2;
-        gbcStartBtn.fill = GridBagConstraints.BOTH;
-        gbcStartBtn.insets = translateInsets(new Insets(15, 10, 5, 75));
-        // gbcNextSessionBtn.weightx = 1.0;
-        gbcStartBtn.weighty = 1.0;
-
-        GridBagConstraints gbcQuitBtn = new GridBagConstraints();
-        gbcQuitBtn.gridx = 3;
-        gbcQuitBtn.gridy = 10;
-        gbcQuitBtn.gridwidth = 2;
-        gbcQuitBtn.fill = GridBagConstraints.BOTH;
-        gbcQuitBtn.insets = translateInsets(new Insets(5, 10, 10, 75));
-        // gbcQuitBtn.weightx = 1.0;
-        gbcQuitBtn.weighty = 1.0;
-
-        GridBagConstraints gbcStudentsSP = new GridBagConstraints();
-        gbcStudentsSP.fill = GridBagConstraints.BOTH;
-        gbcStudentsSP.insets = translateInsets(new Insets(0, 75, 0, 50));
-        gbcStudentsSP.gridx = 0;
-        gbcStudentsSP.gridy = 2;
-        gbcStudentsSP.weightx = 1.0;
-        gbcStudentsSP.weighty = 1.0;
-        gbcStudentsSP.gridwidth = 2;
-        gbcStudentsSP.gridheight = 7;
-
-        GridBagConstraints gbcTitleLabel = new GridBagConstraints();
-        gbcTitleLabel.gridx = 0;
-        gbcTitleLabel.gridy = 0;
-        gbcTitleLabel.gridwidth = 5;
-        gbcTitleLabel.insets = translateInsets(new Insets(10, 10, 10, 10));
-        gbcTitleLabel.weightx = 1.0;
-        gbcTitleLabel.weighty = 1.0;
-
-        GridBagConstraints gbcHelpButton = new GridBagConstraints();
-        gbcHelpButton.gridx = 0;
-        gbcHelpButton.gridy = 0;
-        gbcHelpButton.gridwidth = 5;
-        gbcHelpButton.insets = translateInsets(new Insets(10, 10, 10, 75));
-        gbcHelpButton.weightx = 0;
-        gbcHelpButton.weighty = 0;
-        gbcHelpButton.anchor = GridBagConstraints.NORTHEAST;
-
-        this.setLayout(new GridBagLayout());
-        this.add(titleLabel, gbcTitleLabel);
-        this.add(helpButton, gbcHelpButton);
-        this.add(studentListScrollPane, gbcStudentsSP);
-        this.add(modifyButton, gbcModifyBtn);
-        this.add(startButton, gbcStartBtn);
-        this.add(lastNameLabel, gbcLastNameLabel);
-        this.add(firstNameLabel, gbcFirstNameLabel);
-        this.add(ageLabel, gbcAgeLabel);
-        this.add(classLabel, gbcClassLabel);
-        this.add(sexLabel, gbcSexLabel);
-        this.add(startLevelLabel, gbcStartLevelLabel);
-        this.add(sessionsPlayedLabel, gbcSessionsPlayedLabel);
-        this.add(quitButton, gbcQuitBtn);
-        this.add(newStudentButton, gbcNewStudentBtn);
-        this.add(confirmButton, gbcConfirmBtn);
-        this.add(cancelButton, gbcCancelBtn);
-        this.add(deleteButton, gbcDeleteBtn);
-        this.add(textFieldLastName, gbcTFLastName);
-        this.add(textFieldFirstName, gbcTFFirstName);
-        this.add(textFieldAge, gbcTFAge);
-        this.add(textFieldClass, gbcTFClass);
-        this.add(cbGender, gbcTFSex);
-        this.add(cbStartLevel, gbcTFStartLevel);
-
-        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_HELP,
-                                                                                  0,
-                                                                                  true),
-                                                           "showHelp");
-        getActionMap().put("showHelp", getHelpAction());
-
+    private ImageIcon loadArt(String name) {
+        URL url = RegistrationScreen.class.getResource("registration/" + name);
+        return url == null ? null : new ImageIcon(url);
     }
+
+    private void styleCard(JPanel panel) {
+        panel.setOpaque(true);
+        panel.setBackground(new Color(239, 248, 255));
+        panel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(90, 155, 205), i(2), true),
+            BorderFactory.createEmptyBorder(i(16), i(20), i(16), i(20))));
+    }
+
+    private void styleButton(JButton button, Color background, Color foreground, int size) {
+        button.setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, i(size)));
+        button.setBackground(background);
+        button.setForeground(foreground);
+        button.setOpaque(false);
+        button.setContentAreaFilled(false);
+        button.setUI(new javax.swing.plaf.basic.BasicButtonUI() {
+            @Override public void paint(Graphics g, JComponent c) {
+                Graphics2D gg = (Graphics2D) g.create();
+                gg.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+                JButton b = (JButton)c;
+                Color base = b.isEnabled() ? b.getBackground() : new Color(220, 226, 231);
+                if (b.getModel().isPressed()) base = base.darker();
+                gg.setColor(base);
+                gg.fillRoundRect(1, 1, c.getWidth()-2, c.getHeight()-2, i(18), i(18));
+                gg.setColor(b.hasFocus() ? INK : base.darker());
+                gg.setStroke(new java.awt.BasicStroke(b.hasFocus() ? 3f : 1f));
+                gg.drawRoundRect(2, 2, c.getWidth()-5, c.getHeight()-5, i(18), i(18));
+                gg.dispose();
+                super.paint(g,c);
+            }
+        });
+        button.setBorder(BorderFactory.createEmptyBorder(i(8), i(14), i(8), i(14)));
+        button.setMargin(new Insets(i(10), i(14), i(10), i(14)));
+        button.setPreferredSize(new Dimension(button.getPreferredSize().width, i(48)));
+    }
+
+    private void initialize() {
+        setLayout(new java.awt.BorderLayout());
+        setBorder(BorderFactory.createEmptyBorder(i(20), i(24), i(20), i(24)));
+        pages = new JPanel(cards);
+        pages.setOpaque(false);
+        add(pages, java.awt.BorderLayout.CENTER);
+        titleLabel.setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, i(26)));
+        titleLabel.setForeground(INK);
+        JPanel selection = new JPanel(new java.awt.BorderLayout(i(12), i(12)));
+        styleCard(selection);
+        JPanel header = new JPanel(new java.awt.BorderLayout());
+        header.setOpaque(false);
+        header.add(titleLabel, java.awt.BorderLayout.CENTER);
+        header.add(helpButton, java.awt.BorderLayout.EAST);
+        selection.add(header, java.awt.BorderLayout.NORTH);
+        studentList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        studentList.setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, i(18)));
+        studentList.setFixedCellHeight(i(44));
+        studentList.setSelectionBackground(new Color(255, 239, 164));
+        studentList.setBackground(new Color(235, 245, 252));
+        studentList.setSelectionForeground(INK);
+        studentList.setForeground(INK);
+        studentList.setCellRenderer(new DefaultListCellRenderer() {
+            @Override public Component getListCellRendererComponent(JList list, Object value,
+                    int index, boolean selected, boolean focus) {
+                super.getListCellRendererComponent(list, value, index, selected, focus);
+                if (value instanceof Student) {
+                    Student student = (Student) value;
+                    setText((selected ? "\u2713  " : "     ") + student.getFirstName() + " " + student.getLastName());
+                }
+                setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(208, 220, 232)),
+                    BorderFactory.createEmptyBorder(0, i(12), 0, i(12))));
+                return this;
+            }
+        });
+        studentListScrollPane.setPreferredSize(new Dimension(i(460), i(210)));
+        selection.add(studentListScrollPane, java.awt.BorderLayout.CENTER);
+        JPanel actions = new JPanel(new java.awt.BorderLayout(i(8), i(8)));
+        actions.setOpaque(false);
+        styleButton(startButton, new Color(255, 207, 48), INK, 24);
+        startButton.setPreferredSize(new Dimension(i(220), i(50)));
+        JPanel playRow = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 0, 0));
+        playRow.setOpaque(false);
+        playRow.add(startButton);
+        actions.add(playRow, java.awt.BorderLayout.NORTH);
+        JPanel secondary = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, i(8), 0));
+        secondary.setOpaque(false);
+        for (JButton button : new JButton[] {newStudentButton, modifyButton, quitButton}) {
+            styleButton(button, button == newStudentButton ? GREEN : button == modifyButton ? new Color(32, 104, 175) : new Color(218, 236, 250), button == quitButton ? INK : Color.WHITE, 16);
+            secondary.add(button);
+        }
+        actions.add(secondary, java.awt.BorderLayout.SOUTH);
+        selection.add(actions, java.awt.BorderLayout.SOUTH);
+        JPanel selectionHost = new JPanel(new GridBagLayout());
+        selectionHost.setOpaque(false);
+        selectionHost.add(selection, new GridBagConstraints());
+        pages.add(selectionHost, "selection");
+
+        JPanel editor = new JPanel(new java.awt.BorderLayout(i(8), i(8)));
+        styleCard(editor);
+        editorTitle = new JLabel("", SwingConstants.CENTER);
+        editorTitle.setFont(titleLabel.getFont());
+        editorTitle.setForeground(INK);
+        editor.add(editorTitle, java.awt.BorderLayout.NORTH);
+        JPanel form = new JPanel(new GridBagLayout());
+        form.setOpaque(false);
+        JLabel[] labels = {firstNameLabel, lastNameLabel, ageLabel, classLabel, sexLabel, startLevelLabel};
+        JComponent[] fields = {textFieldFirstName, textFieldLastName, textFieldAge, textFieldClass, cbGender, cbStartLevel};
+        for (int row = 0; row < labels.length; row++) {
+            labels[row].setFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, i(16)));
+            labels[row].setForeground(INK);
+            labels[row].setLabelFor(fields[row]);
+            fields[row].setFont(labels[row].getFont());
+            fields[row].setPreferredSize(new Dimension(i(row == 2 ? 90 : row == 3 ? 150 : 260), i(32)));
+            GridBagConstraints c = new GridBagConstraints();
+            c.gridy = row; c.gridx = 0; c.anchor = GridBagConstraints.LINE_START;
+            c.insets = new Insets(i(4), i(6), i(4), i(6));
+            form.add(labels[row], c);
+            c.gridx = 1; c.weightx = 0; c.fill = GridBagConstraints.NONE;
+            form.add(fields[row], c);
+        }
+        GridBagConstraints session = new GridBagConstraints();
+        session.gridy = labels.length; session.gridwidth = 2; session.anchor = GridBagConstraints.LINE_START;
+        form.add(sessionsPlayedLabel, session);
+        editor.add(form, java.awt.BorderLayout.CENTER);
+        JPanel editActions = new JPanel(new java.awt.BorderLayout(i(8), i(8)));
+        editActions.setOpaque(false);
+        JPanel saveActions = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, i(8), 0));
+        saveActions.setOpaque(false);
+        styleButton(confirmButton, GREEN, Color.WHITE, 18);
+        styleButton(cancelButton, Color.WHITE, INK, 18);
+        styleButton(deleteButton, new Color(180, 35, 24), Color.WHITE, 16);
+        saveActions.add(confirmButton); saveActions.add(cancelButton);
+        editActions.add(saveActions, java.awt.BorderLayout.NORTH);
+        JPanel deleteRow = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 0, 0));
+        deleteRow.setOpaque(false);
+        deleteRow.add(deleteButton);
+        editActions.add(deleteRow, java.awt.BorderLayout.SOUTH);
+        editor.add(editActions, java.awt.BorderLayout.SOUTH);
+        JPanel editorHost = new JPanel(new GridBagLayout());
+        editorHost.setOpaque(false);
+        editorHost.add(editor, new GridBagConstraints());
+        JScrollPane editorScroll = new JScrollPane(editorHost);
+        editorScroll.setBorder(null);
+        editorScroll.setOpaque(false);
+        editorScroll.getViewport().setOpaque(false);
+        pages.add(editorScroll, "editor");
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_HELP, 0, true), "showHelp");
+        getActionMap().put("showHelp", getHelpAction());
+    }
+
+    private JLabel editorTitle;
 
     public void load() {
         // load up the studentlist file
@@ -373,7 +302,8 @@ public class RegistrationScreen extends JPanel implements
         setDataEntryCompntsActive(false);
         setSelectionCompntsActive(true);
         if (studentList.getModel().getSize() > 0) {
-            studentList.setSelectedIndex(0);
+            studentList.clearSelection();
+            studentList.requestFocusInWindow();
         } else {
             startButton.setEnabled(false);
             modifyButton.setEnabled(false);
@@ -389,6 +319,7 @@ public class RegistrationScreen extends JPanel implements
     }
 
     public void valueChanged(ListSelectionEvent e) {
+        if (e.getValueIsAdjusting()) return;
         transferSelectedStudentInfo();
         if (studentList.isSelectionEmpty()) {
             startButton.setEnabled(false);
@@ -397,7 +328,6 @@ public class RegistrationScreen extends JPanel implements
             startButton.setEnabled(true);
             modifyButton.setEnabled(true);
         }
-        newStudent = false;
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -409,7 +339,9 @@ public class RegistrationScreen extends JPanel implements
             // activate fields for currently selected student, and enter/delete
             // buttons
             if (studentList.getSelectedValue() != null) {
+                newStudent = false;
                 modifying = true;
+                transferSelectedStudentInfo();
                 setDataEntryCompntsActive(true);
                 setSelectionCompntsActive(false);
             } else {
@@ -426,6 +358,7 @@ public class RegistrationScreen extends JPanel implements
             // enter a new student
             // clear any list selection
             studentList.clearSelection();
+            modifying = false;
             newStudent = true;
             // activate and clear the text fields
             setDataEntryCompntsActive(true);
@@ -461,11 +394,18 @@ public class RegistrationScreen extends JPanel implements
                 });
             }
         } else if (actor == confirmButton) {
+            try {
+                if (Integer.parseInt(textFieldAge.getText().trim()) <= 0) throw new NumberFormatException();
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, Messages.getString("LangVars.REG_INVALIDAGE"));
+                textFieldAge.requestFocusInWindow();
+                return;
+            }
             // First check that all the relevant information is entered
             boolean allInfoEntered = true;
             Utilities.log.info("[" + cbStartLevel.getSelectedItem() + "]");
-            allInfoEntered = !("".equals(textFieldLastName.getText())
-                    || "".equals(textFieldFirstName.getText())
+            allInfoEntered = !("".equals(textFieldLastName.getText().trim())
+                    || "".equals(textFieldFirstName.getText().trim())
                     || "".equals(textFieldAge.getText().trim())
                     || "".equals(textFieldClass.getText().trim())
                     || (cbGender.getSelectedIndex() == -1 /* "?" */) || (newStudent && (cbStartLevel.getSelectedIndex() == -1)));
@@ -483,13 +423,14 @@ public class RegistrationScreen extends JPanel implements
                 // check this student doesn't already exist, if they do, show an
                 // error msg and exit
                 boolean duplicateStudentExists = false;
-                String lastName = textFieldLastName.getText();
-                String firstName = textFieldFirstName.getText();
+                String lastName = textFieldLastName.getText().trim();
+                String firstName = textFieldFirstName.getText().trim();
                 Student tmpStudent;
                 for (int i = 0; i < studentListData.size(); i++) {
                     tmpStudent = studentListData.elementAt(i);
-                    if ((tmpStudent.getLastName() == lastName)
-                            && (tmpStudent.getFirstName() == firstName)) {
+                    if ((!modifying || tmpStudent != studentList.getSelectedValue())
+                            && tmpStudent.getLastName().equalsIgnoreCase(lastName)
+                            && tmpStudent.getFirstName().equalsIgnoreCase(firstName)) {
                         duplicateStudentExists = true;
                     }
                 }
@@ -506,9 +447,9 @@ public class RegistrationScreen extends JPanel implements
                     // the entered ones
                     if (modifying) {
                         tmpStudent = (Student) studentList.getSelectedValue();
-                        tmpStudent.setLastName(textFieldLastName.getText());
-                        tmpStudent.setfirstName(textFieldFirstName.getText());
-                        tmpStudent.setAge(Integer.parseInt(textFieldAge.getText()));
+                        tmpStudent.setLastName(textFieldLastName.getText().trim());
+                        tmpStudent.setfirstName(textFieldFirstName.getText().trim());
+                        tmpStudent.setAge(Integer.parseInt(textFieldAge.getText().trim()));
                         tmpStudent.setClassLevel(textFieldClass.getText());
                         tmpStudent.setSex(cbGender.getSelectedIndex());
                         // tmpStudent.classLevel =
@@ -517,19 +458,18 @@ public class RegistrationScreen extends JPanel implements
                         // (String)comboBoxSex.getSelectedItem();
 
                         // will happen only for newly created pupil, because after pupil created you can not change start level (control disabled)
-                        tmpStudent.setStartLevel(cbStartLevel.getSelectedItem()
-                                                             .toString());
+                        // Preserve the initial level of an existing player.
                         studentListData.set(studentList.getSelectedIndex(),
                                             tmpStudent);
                     } else { // otherwise, add the name to the data vector
                         // Save the info in a Student data object
-                        boolean[][] characAccess = { DEFAULT_ACCESS_PARAMS,
-                                DEFAULT_ACCESS_PARAMS };
+                        boolean[][] characAccess = { DEFAULT_ACCESS_PARAMS.clone(),
+                                DEFAULT_ACCESS_PARAMS.clone() };
                         Student newStudent = new Student(
                                 studentListData.size() + 1,
-                                textFieldLastName.getText(),
-                                textFieldFirstName.getText(),
-                                Integer.parseInt(textFieldAge.getText()),
+                                textFieldLastName.getText().trim(),
+                                textFieldFirstName.getText().trim(),
+                                Integer.parseInt(textFieldAge.getText().trim()),
                                 textFieldClass.getText(),
                                 cbGender.getSelectedIndex(),
                                 cbStartLevel.getSelectedItem().toString(),
@@ -552,11 +492,14 @@ public class RegistrationScreen extends JPanel implements
                     setDataEntryCompntsActive(false);
                     setSelectionCompntsActive(true);
                     modifying = false;
+                    newStudent = false;
+                    studentList.repaint();
                 }
             }
         } else if (actor == cancelButton) {
             // reset the display
             modifying = false;
+            newStudent = false;
             setDataEntryCompntsActive(false);
             setSelectionCompntsActive(true);
             transferSelectedStudentInfo();
@@ -588,7 +531,10 @@ public class RegistrationScreen extends JPanel implements
                         setDataEntryCompntsActive(false);
                         setSelectionCompntsActive(true);
                         modifying = false;
+                        studentList.setListData(studentListData);
                         studentList.clearSelection();
+                        newStudent = false;
+                        setSelectionCompntsActive(true);
                     }
                 }
 
@@ -598,6 +544,13 @@ public class RegistrationScreen extends JPanel implements
     }
 
     private void setDataEntryCompntsActive(boolean active) {
+        deleteButton.setVisible(active && !newStudent);
+        sessionsPlayedLabel.setVisible(active && !newStudent && studentList.getSelectedValue() != null && ((Student) studentList.getSelectedValue()).getSessionNumber() > 0);
+        if (active) {
+            editorTitle.setText(newStudent ? newStudentButton.getText() : modifyButton.getText());
+        }
+        cards.show(pages, active ? "editor" : "selection");
+        if (active) SwingUtilities.invokeLater(() -> textFieldFirstName.requestFocusInWindow());
         // used to activate/deactivate the data entry components on the RH of the screen
         // and to pass the selected student's values into them for modification
         if (!active) {
@@ -657,9 +610,9 @@ public class RegistrationScreen extends JPanel implements
         } else {
             studentList.setEnabled(true);
             quitButton.setEnabled(true);
-            modifyButton.setEnabled(true);
+            modifyButton.setEnabled(!studentList.isSelectionEmpty());
             newStudentButton.setEnabled(true);
-            startButton.setEnabled(true);
+            startButton.setEnabled(!studentList.isSelectionEmpty());
         }
     }
 
@@ -847,7 +800,7 @@ public class RegistrationScreen extends JPanel implements
         studentList = new JList();
         studentList.setFont(GameObject.getInstance().getTheme().regScreenTextFont);
         studentList.addListSelectionListener(this);
-        studentList.setListData(studentListData);
+        studentList.setListData(new Vector<Student>());
 
         studentListScrollPane = new SafeScrollPane();
         studentListScrollPane.setViewportView(studentList);
@@ -862,7 +815,8 @@ public class RegistrationScreen extends JPanel implements
                 ImageFactory.getImage(Resources.getString("help_button.pressed"))));
         //        helpButton.setRolloverIcon(new ImageIcon(ImageFactory.getImage(Resources.getString("help_button.over"))));
         //        helpButton.setRolloverEnabled(true);
-        helpButton.setFocusable(false);
+        helpButton.setFocusable(true);
+        helpButton.getAccessibleContext().setAccessibleName("Help");
         helpButton.setPreferredSize(new Dimension(imageIcon.getIconWidth() + 1,
                 imageIcon.getIconHeight() + 1));
         return true;
@@ -948,7 +902,24 @@ public class RegistrationScreen extends JPanel implements
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawString(versionStr, 3, getHeight() - 3);
+        Graphics2D bg = (Graphics2D) g.create();
+        int w = getWidth(), h = getHeight();
+        bg.setPaint(new java.awt.GradientPaint(0, 0, new Color(92, 196, 240), 0, h, new Color(224, 248, 255)));
+        bg.fillRect(0, 0, w, h);
+        bg.setColor(new Color(255,255,255,210));
+        for (int x = w/8; x < w; x += Math.max(1,w/3)) {
+            bg.fillOval(x, h/12, w/8, h/18);
+            bg.fillOval(x+w/30, h/16, w/12, h/14);
+        }
+        bg.setColor(new Color(126, 199, 86));
+        bg.fillOval(-w/3, h*3/4, w, h/2);
+        bg.setColor(new Color(166, 219, 103));
+        bg.fillOval(w/3, h*4/5, w, h/2);
+        int aw = Math.min(w/7, i(125));
+        if (carArt != null && aw > 0) bg.drawImage(carArt.getImage(), i(12), i(12), aw, aw*carArt.getIconHeight()/carArt.getIconWidth(), this);
+        if (flagArt != null && aw > 0) bg.drawImage(flagArt.getImage(), w-aw-i(12), i(12), aw, aw*flagArt.getIconHeight()/flagArt.getIconWidth(), this);
+        bg.dispose();
+        if (versionStr != null) g.drawString(versionStr, 3, getHeight() - 3);
     }
 
 }

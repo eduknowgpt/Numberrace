@@ -1,0 +1,1 @@
+Extrair na raiz do projeto. Substitui RegistrationScreen.java e adiciona dois PNGs em recursos Maven. Mantém CardLayout e traduções. Fundo desenhado em Java; imagens recortadas da proposta fornecida. Avatares individuais não implementados. Testar execução e WindowBuilder.
