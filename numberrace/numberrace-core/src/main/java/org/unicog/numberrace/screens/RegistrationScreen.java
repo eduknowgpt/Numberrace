@@ -27,6 +27,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
+import org.unicog.numberrace.ui.*;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -133,47 +134,20 @@ public class RegistrationScreen extends JPanel implements
     private static final Color INK = new Color(23, 62, 105);
     private static final Color GREEN = new Color(35, 123, 70);
 
-    private final ImageIcon carArt = loadArt("car.png");
-    private final ImageIcon flagArt = loadArt("flag.png");
-
-    private ImageIcon loadArt(String name) {
-        URL url = RegistrationScreen.class.getResource("registration/" + name);
-        return url == null ? null : new ImageIcon(url);
-    }
-
+    private final GameBackground gameBackground = new GameBackground();
     private void styleCard(JPanel panel) {
-        panel.setOpaque(true);
-        panel.setBackground(new Color(239, 248, 255));
-        panel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(90, 155, 205), i(2), true),
-            BorderFactory.createEmptyBorder(i(16), i(20), i(16), i(20))));
+        panel.setBorder(BorderFactory.createEmptyBorder(i(16), i(20), i(20), i(20)));
     }
-
     private void styleButton(JButton button, Color background, Color foreground, int size) {
         button.setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, i(size)));
-        button.setBackground(background);
-        button.setForeground(foreground);
-        button.setOpaque(false);
-        button.setContentAreaFilled(false);
-        button.setUI(new javax.swing.plaf.basic.BasicButtonUI() {
-            @Override public void paint(Graphics g, JComponent c) {
-                Graphics2D gg = (Graphics2D) g.create();
-                gg.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
-                JButton b = (JButton)c;
-                Color base = b.isEnabled() ? b.getBackground() : new Color(220, 226, 231);
-                if (b.getModel().isPressed()) base = base.darker();
-                gg.setColor(base);
-                gg.fillRoundRect(1, 1, c.getWidth()-2, c.getHeight()-2, i(18), i(18));
-                gg.setColor(b.hasFocus() ? INK : base.darker());
-                gg.setStroke(new java.awt.BasicStroke(b.hasFocus() ? 3f : 1f));
-                gg.drawRoundRect(2, 2, c.getWidth()-5, c.getHeight()-5, i(18), i(18));
-                gg.dispose();
-                super.paint(g,c);
-            }
-        });
-        button.setBorder(BorderFactory.createEmptyBorder(i(8), i(14), i(8), i(14)));
-        button.setMargin(new Insets(i(10), i(14), i(10), i(14)));
-        button.setPreferredSize(new Dimension(button.getPreferredSize().width, i(48)));
+        button.setBackground(background); button.setForeground(foreground);
+        button.setUI(new GameButton()); button.setOpaque(false);
+        button.setContentAreaFilled(false); button.setBorderPainted(false);
+        String icon = button==startButton?"play":button==newStudentButton?"add":button==modifyButton?"edit":button==confirmButton?"save":button==deleteButton?"delete":button==quitButton?"exit":"cancel";
+        button.setIcon(new GameIcon(icon,i(20))); button.setIconTextGap(i(6));
+        button.setRolloverEnabled(true); button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(i(8),i(14),i(12),i(14)));
+        button.setPreferredSize(new Dimension(button.getPreferredSize().width,i(48)));
     }
 
     private void initialize() {
@@ -183,35 +157,26 @@ public class RegistrationScreen extends JPanel implements
         pages.setOpaque(false);
         add(pages, java.awt.BorderLayout.CENTER);
         titleLabel.setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, i(26)));
-        titleLabel.setForeground(INK);
-        JPanel selection = new JPanel(new java.awt.BorderLayout(i(12), i(12)));
+        titleLabel.setForeground(Color.WHITE);
+        JPanel selection = new GamePanel(new java.awt.BorderLayout(i(12), i(12)));
         styleCard(selection);
-        JPanel header = new JPanel(new java.awt.BorderLayout());
+        JPanel header = new GameHeader();
         header.setOpaque(false);
         header.add(titleLabel, java.awt.BorderLayout.CENTER);
         header.add(helpButton, java.awt.BorderLayout.EAST);
         selection.add(header, java.awt.BorderLayout.NORTH);
         studentList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         studentList.setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, i(18)));
-        studentList.setFixedCellHeight(i(44));
+        studentList.setFixedCellHeight(i(54));
         studentList.setSelectionBackground(new Color(255, 239, 164));
         studentList.setBackground(new Color(235, 245, 252));
         studentList.setSelectionForeground(INK);
         studentList.setForeground(INK);
-        studentList.setCellRenderer(new DefaultListCellRenderer() {
-            @Override public Component getListCellRendererComponent(JList list, Object value,
-                    int index, boolean selected, boolean focus) {
-                super.getListCellRendererComponent(list, value, index, selected, focus);
-                if (value instanceof Student) {
-                    Student student = (Student) value;
-                    setText((selected ? "\u2713  " : "     ") + student.getFirstName() + " " + student.getLastName());
-                }
-                setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(208, 220, 232)),
-                    BorderFactory.createEmptyBorder(0, i(12), 0, i(12))));
-                return this;
-            }
-        });
+        studentList.setCellRenderer(new PlayerCellRenderer());
+        studentList.setOpaque(false);
+        studentListScrollPane.setOpaque(false);
+        studentListScrollPane.getViewport().setOpaque(false);
+        studentListScrollPane.setBorder(BorderFactory.createEmptyBorder());
         studentListScrollPane.setPreferredSize(new Dimension(i(460), i(210)));
         selection.add(studentListScrollPane, java.awt.BorderLayout.CENTER);
         JPanel actions = new JPanel(new java.awt.BorderLayout(i(8), i(8)));
@@ -235,12 +200,14 @@ public class RegistrationScreen extends JPanel implements
         selectionHost.add(selection, new GridBagConstraints());
         pages.add(selectionHost, "selection");
 
-        JPanel editor = new JPanel(new java.awt.BorderLayout(i(8), i(8)));
+        JPanel editor = new GamePanel(new java.awt.BorderLayout(i(8), i(8)));
         styleCard(editor);
         editorTitle = new JLabel("", SwingConstants.CENTER);
         editorTitle.setFont(titleLabel.getFont());
-        editorTitle.setForeground(INK);
-        editor.add(editorTitle, java.awt.BorderLayout.NORTH);
+        editorTitle.setForeground(Color.WHITE);
+        JPanel editorHeader = new GameHeader();
+        editorHeader.add(editorTitle, java.awt.BorderLayout.CENTER);
+        editor.add(editorHeader, java.awt.BorderLayout.NORTH);
         JPanel form = new JPanel(new GridBagLayout());
         form.setOpaque(false);
         JLabel[] labels = {firstNameLabel, lastNameLabel, ageLabel, classLabel, sexLabel, startLevelLabel};
@@ -255,11 +222,39 @@ public class RegistrationScreen extends JPanel implements
             c.gridy = row; c.gridx = 0; c.anchor = GridBagConstraints.LINE_START;
             c.insets = new Insets(i(4), i(6), i(4), i(6));
             form.add(labels[row], c);
-            c.gridx = 1; c.weightx = 0; c.fill = GridBagConstraints.NONE;
-            form.add(fields[row], c);
+            GridBagConstraints fieldConstraints = new GridBagConstraints();
+            fieldConstraints.gridy = row;
+            fieldConstraints.gridx = 1;
+            fieldConstraints.anchor = GridBagConstraints.LINE_START;
+            fieldConstraints.insets = new Insets(i(4), i(6), i(4), i(6));
+            fieldConstraints.fill = GridBagConstraints.NONE;
+            form.add(fields[row], fieldConstraints);
         }
+        JLabel avatarLabel = new JLabel("Avatar:");
+        avatarLabel.setFont(labels[0].getFont()); avatarLabel.setForeground(INK); avatarLabel.setLabelFor(avatarChoice);
+        avatarChoice.setRenderer(new DefaultListCellRenderer() {
+            @Override public Component getListCellRendererComponent(JList list,Object value,int index,boolean selected,boolean focus) {
+                super.getListCellRendererComponent(list,value,index,selected,focus);
+                int n = value instanceof Integer ? (Integer)value : -1;
+                setIcon(PlayerAvatars.icon(n,i(30))); setText(n<0?"ABC": "Avatar "+(n+1)); return this;
+            }
+        });
+        avatarChoice.setPreferredSize(new Dimension(i(150),i(38)));
+        GridBagConstraints gbcAvatarLabel = new GridBagConstraints();
+        gbcAvatarLabel.gridx = 0;
+        gbcAvatarLabel.gridy = labels.length;
+        gbcAvatarLabel.anchor = GridBagConstraints.LINE_START;
+        gbcAvatarLabel.insets = new Insets(i(4), i(6), i(4), i(6));
+        form.add(avatarLabel, gbcAvatarLabel);
+
+        GridBagConstraints gbcAvatarChoice = new GridBagConstraints();
+        gbcAvatarChoice.gridx = 1;
+        gbcAvatarChoice.gridy = labels.length;
+        gbcAvatarChoice.anchor = GridBagConstraints.LINE_START;
+        gbcAvatarChoice.insets = new Insets(i(4), i(6), i(4), i(6));
+        form.add(avatarChoice, gbcAvatarChoice);
         GridBagConstraints session = new GridBagConstraints();
-        session.gridy = labels.length; session.gridwidth = 2; session.anchor = GridBagConstraints.LINE_START;
+        session.gridy = labels.length+1; session.gridwidth = 2; session.anchor = GridBagConstraints.LINE_START;
         form.add(sessionsPlayedLabel, session);
         editor.add(form, java.awt.BorderLayout.CENTER);
         JPanel editActions = new JPanel(new java.awt.BorderLayout(i(8), i(8)));
@@ -289,6 +284,7 @@ public class RegistrationScreen extends JPanel implements
     }
 
     private JLabel editorTitle;
+    private final javax.swing.JComboBox<Integer> avatarChoice = new javax.swing.JComboBox<Integer>(new Integer[]{-1,0,1,2,3});
 
     public void load() {
         // load up the studentlist file
@@ -483,6 +479,7 @@ public class RegistrationScreen extends JPanel implements
                         studentList.setListData(studentListData);
                         studentList.setSelectedValue(newStudent, true);
                     }
+                    if(studentList.getSelectedValue()!=null) PlayerAvatars.save((Student)studentList.getSelectedValue(), (Integer)avatarChoice.getSelectedItem());
                     // save the student list
                     GameObject.getInstance()
                               .getDataFileHandler()
@@ -520,6 +517,7 @@ public class RegistrationScreen extends JPanel implements
 
                     if (choice == 1) {
                         // remove from the data list
+                        PlayerAvatars.save((Student)studentList.getSelectedValue(), -1);
                         studentListData.remove(studentList.getSelectedValue());
 
                         // save the student list
@@ -547,6 +545,7 @@ public class RegistrationScreen extends JPanel implements
         deleteButton.setVisible(active && !newStudent);
         sessionsPlayedLabel.setVisible(active && !newStudent && studentList.getSelectedValue() != null && ((Student) studentList.getSelectedValue()).getSessionNumber() > 0);
         if (active) {
+            avatarChoice.setSelectedItem(newStudent || studentList.getSelectedValue()==null ? -1 : PlayerAvatars.get((Student)studentList.getSelectedValue()));
             editorTitle.setText(newStudent ? newStudentButton.getText() : modifyButton.getText());
         }
         cards.show(pages, active ? "editor" : "selection");
@@ -902,23 +901,7 @@ public class RegistrationScreen extends JPanel implements
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Graphics2D bg = (Graphics2D) g.create();
-        int w = getWidth(), h = getHeight();
-        bg.setPaint(new java.awt.GradientPaint(0, 0, new Color(92, 196, 240), 0, h, new Color(224, 248, 255)));
-        bg.fillRect(0, 0, w, h);
-        bg.setColor(new Color(255,255,255,210));
-        for (int x = w/8; x < w; x += Math.max(1,w/3)) {
-            bg.fillOval(x, h/12, w/8, h/18);
-            bg.fillOval(x+w/30, h/16, w/12, h/14);
-        }
-        bg.setColor(new Color(126, 199, 86));
-        bg.fillOval(-w/3, h*3/4, w, h/2);
-        bg.setColor(new Color(166, 219, 103));
-        bg.fillOval(w/3, h*4/5, w, h/2);
-        int aw = Math.min(w/7, i(125));
-        if (carArt != null && aw > 0) bg.drawImage(carArt.getImage(), i(12), i(12), aw, aw*carArt.getIconHeight()/carArt.getIconWidth(), this);
-        if (flagArt != null && aw > 0) bg.drawImage(flagArt.getImage(), w-aw-i(12), i(12), aw, aw*flagArt.getIconHeight()/flagArt.getIconWidth(), this);
-        bg.dispose();
+        gameBackground.paint(g, getWidth(), getHeight());
         if (versionStr != null) g.drawString(versionStr, 3, getHeight() - 3);
     }
 

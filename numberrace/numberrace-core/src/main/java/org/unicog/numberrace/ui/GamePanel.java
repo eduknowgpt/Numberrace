@@ -1,0 +1,3 @@
+package org.unicog.numberrace.ui;
+import java.awt.*;import javax.swing.*;
+public class GamePanel extends JPanel {public GamePanel(){this(new BorderLayout());} public GamePanel(LayoutManager l){super(l);setOpaque(false);} protected void paintComponent(Graphics g){super.paintComponent(g);Graphics2D p=GameTheme.graphics(g);GameTheme.surface(p,getWidth(),getHeight(),new Color(250,253,255),new Color(199,231,250),32);p.dispose();}}

@@ -1,0 +1,3 @@
+package org.unicog.numberrace.ui;
+import java.awt.*;import javax.swing.*;
+public class GameHeader extends JPanel {public GameHeader(){super(new BorderLayout());setOpaque(false);setBorder(BorderFactory.createEmptyBorder(12,18,16,18));} protected void paintComponent(Graphics g){super.paintComponent(g);Graphics2D p=GameTheme.graphics(g);GameTheme.surface(p,getWidth(),getHeight(),new Color(42,166,235),GameTheme.BLUE,30);p.dispose();}}

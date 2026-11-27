@@ -1,0 +1,3 @@
+package org.unicog.numberrace.ui;
+import java.awt.*;import javax.swing.*;
+public final class GameBackground {private final ImageIcon art=GameAssets.load("background.jpg");public void paint(Graphics g,int w,int h){Graphics2D p=GameTheme.graphics(g);p.setColor(new Color(116,207,239));p.fillRect(0,0,w,h);if(art!=null){double s=Math.max((double)w/art.getIconWidth(),(double)h/art.getIconHeight());int x=(int)(art.getIconWidth()*s),y=(int)(art.getIconHeight()*s);p.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR);p.drawImage(art.getImage(),(w-x)/2,(h-y)/2,x,y,null);}p.dispose();}}
