@@ -66,5 +66,9 @@ are documented here.
 - Removed the click heard at the start of every sound: `SoundPlayer.play` no longer
   resets the audio stream, which, with the buffered streams above, moved it back to
   the start of the file and played the WAV header as sound.
+- Restored the numbers spoken by the child's character (Friend1): the number sounds were
+  registered under the number names (`friend1_two`, `friend1_counting_counting_one`) while the
+  game requests them by digit (`friend1_2`, `friend1_counting_1`), as for the opponent, so only
+  "plus", "minus" and "equals" were heard.
 - Fixed Portuguese localized resource loading.
 - Improved diagnostics for missing audio resources.
